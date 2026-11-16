@@ -6,12 +6,14 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "release": "electron-builder --publish always"
   },
   "dependencies": {
     "@xhayper/discord-rpc": "^1.2.0",
     "music-metadata": "^11.0.0",
-    "gifenc": "^1.0.3"
+    "gifenc": "^1.0.3",
+    "electron-updater": "^6.8.0"
   },
   "devDependencies": {
     "electron": "^33.0.0",
@@ -32,6 +34,11 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "shortcutName": "Gumi RPC"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Nobuqq",
+      "repo": "Gumi-RPC"
     }
   },
   "author": "Gumi RPC",

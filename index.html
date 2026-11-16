@@ -299,6 +299,10 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
         <button id="s-cdtest">Check the music picture on Discord</button>
         <button id="s-log">Open the Discord problem log</button>
         <button id="s-intro">Show Gumi’s intro again</button>
+        <div>
+          <div class="shead">Updates<small>Gumi RPC checks for updates when it opens and downloads them in the background. A new version installs when you restart the app.</small></div>
+          <div class="pick"><button id="s-update">Check for updates</button><span id="updateStatus" class="muted"></span><button id="s-restart" class="off">Restart to install update</button></div>
+        </div>
       </div></div>
       <div id="customizeView" class="off"><div class="box">
         <h2>Customize</h2>
@@ -886,6 +890,8 @@ $('#s-appid').onchange = async (e) => {
   toast('Application ID saved'); api.restore().then((p) => { me = p; showMe(); }); pushPresence();
 };
 $('#s-log').onclick = () => api.openLog();
+$('#s-update').onclick = async () => { $('#updateStatus').textContent = 'Checking…'; const r = await api.checkUpdates(); if (!r || !r.ok) { $('#updateStatus').textContent = ''; return toast((r && r.error) || 'Couldn’t check for updates'); } $('#updateStatus').textContent = r.update ? 'Update found — downloading…' : 'You’re on the latest version'; };
+$('#s-restart').onclick = () => api.restartUpdate();
 $('#s-cdup').checked = S.cdUpload; $('#s-cdup').onchange = (e) => { S.cdUpload = e.target.checked; saveS(); pushPresence(); };
 $('#s-cd').value = S.cdImage; $('#s-cd').onchange = (e) => { S.cdImage = e.target.value.trim(); saveS(); pushPresence(); };
 $('#s-music').checked = S.musicRpc; $('#s-music').onchange = (e) => { S.musicRpc = e.target.checked; saveS(); pushPresence(); };
@@ -1067,4 +1073,6 @@ $('#ask').onclick = async () => {
 };
 
 api.onToast((t) => toast(t)); setView('games'); refresh(); loadMusic(); api.restore().then((p) => { me = p; showMe(); }); if (!localStorage.getItem('gumi-seen')) intro();
+api.onUpdateReady(() => { $('#s-restart').classList.remove('off'); $('#updateStatus').textContent = 'Update downloaded — restart to install it'; });
+api.getVersion().then((v) => { $('#updateStatus').textContent = 'Version ' + v; });
 </script></body></html>

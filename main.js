@@ -6,6 +6,11 @@ const { Client } = require('@xhayper/discord-rpc');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+// Auto-updater (electron-updater + GitHub Releases). Guarded so the app still
+// starts if the package isn't installed yet (e.g. running from source before
+// npm install) — updates simply stay off until it is.
+let autoUpdater = null;
+try { ({ autoUpdater } = require('electron-updater')); } catch {}
 // same data folder whether you run with npm start or the installed .exe
 app.setPath('userData', path.join(app.getPath('appData'), 'gumi-rpc'));
 const ICON = path.join(__dirname, 'build', 'icon.ico');
@@ -448,6 +453,32 @@ ipcMain.handle('music:cover', async (_e, file) => {
   } catch { return null; }
 });
 
-app.whenReady().then(() => { app.setAppUserModelId('com.gumi.rpc'); createWindow(); });
+// ---- Self-updates from GitHub Releases (Nobuqq/Gumi-RPC) ----
+// Only the installed app updates itself: in the test version (npm start)
+// there is no release to compare against, so the updater stays off.
+function setupUpdates() {
+  if (!autoUpdater || !app.isPackaged) return;
+  autoUpdater.autoDownload = true;
+  autoUpdater.on('update-available', () => note('A Gumi RPC update is downloading in the background…'));
+  autoUpdater.on('update-downloaded', () => { win?.webContents.send('update:ready'); note('Update downloaded — restart Gumi RPC to install it.'); });
+  autoUpdater.on('error', (e) => log('Update check failed: ' + (e && e.message ? e.message : e)));
+  autoUpdater.checkForUpdates().catch((e) => log('Update check failed: ' + (e && e.message ? e.message : e)));
+}
+ipcMain.handle('update:check', () => new Promise((resolve) => {
+  if (!autoUpdater) return resolve({ ok: false, error: 'The updater is not installed yet. Run npm install, then rebuild the installer.' });
+  if (!app.isPackaged) return resolve({ ok: false, error: 'Updates only work in the installed app — this is the test version (npm start).' });
+  const done = (r) => { autoUpdater.removeListener('update-available', onAvail); autoUpdater.removeListener('update-not-available', onNone); autoUpdater.removeListener('error', onErr); resolve(r); };
+  const onAvail = () => done({ ok: true, update: true });
+  const onNone = () => done({ ok: true, update: false });
+  const onErr = (e) => done({ ok: false, error: e && e.message ? e.message : String(e) });
+  autoUpdater.once('update-available', onAvail);
+  autoUpdater.once('update-not-available', onNone);
+  autoUpdater.once('error', onErr);
+  autoUpdater.checkForUpdates().catch((e) => done({ ok: false, error: e && e.message ? e.message : String(e) }));
+}));
+ipcMain.handle('update:restart', () => { if (autoUpdater) autoUpdater.quitAndInstall(); return true; });
+ipcMain.handle('app:version', () => app.getVersion());
+
+app.whenReady().then(() => { app.setAppUserModelId('com.gumi.rpc'); createWindow(); setupUpdates(); });
 app.on('before-quit', () => { clearPresence(); });
 app.on('window-all-closed', () => app.quit());
