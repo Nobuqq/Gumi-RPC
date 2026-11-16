@@ -1,6 +1,6 @@
 # Gumi-RPC
 Your multitasking app that lets you run your games and music from one place, with a custom Discord Rich Presence that actually looks like you.
-What it does:
+## What it does:
 1. Game shelf: your games in one launcher. Each game gets its own Discord presence with its art and a Play button.
 2. Music player: play your songs, albums and playlists in-app. While a song plays, Discord shows a spinning CD made from the album cover.
 3. Themes: make a theme from any picture and the whole app matches it: accent colour, boxes, player, everything. Fonts, colours, neon glow and custom sidebar icons are all yours to change.
@@ -11,6 +11,7 @@ What it does:
 # Screenshots
 <img width="1918" height="992" alt="image" src="https://github.com/user-attachments/assets/be8cf37a-f1fa-42e6-997f-149583179f07" />
 <img width="1919" height="988" alt="image" src="https://github.com/user-attachments/assets/2a98ccc4-6f8f-41e6-bc7f-547983629431" />
+
 # Download
 Grab the latest installer from the [Releases](https://github.com/Nobuqq/Gumi-RPC/releases)
 # Discord setup (one time) 
