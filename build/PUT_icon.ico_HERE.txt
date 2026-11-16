@@ -1,0 +1,1 @@
+Put a 256x256 icon.ico in this folder (named exactly icon.ico) before running npm run build. Delete this note if you like.

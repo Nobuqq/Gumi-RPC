@@ -1,0 +1,41 @@
+{
+  "name": "gumi-rpc",
+  "version": "0.1.0",
+  "description": "Launcher and custom Discord Rich Presence for indie games",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "@xhayper/discord-rpc": "^1.2.0",
+    "music-metadata": "^11.0.0",
+    "gifenc": "^1.0.3"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.gumi.rpc",
+    "productName": "Gumi RPC",
+    "artifactName": "Gumi-RPC-Setup-${version}.${ext}",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Gumi RPC"
+    }
+  },
+  "author": "Gumi RPC",
+  "allowScripts": {
+    "electron@33.4.11": true
+  }
+}
