@@ -9,8 +9,8 @@ Your multitasking app that lets you run your games and music from one place, wit
 6. Ask Gumi: a little tour guide that walks new users through the app the first time it opens.
 7. Marketplace (coming soon) — theme packs made by the community, with their own pictures and sounds.
 # Screenshots
-<img width="1918" height="992" alt="image" src="https://github.com/user-attachments/assets/be8cf37a-f1fa-42e6-997f-149583179f07" />
-<img width="1919" height="988" alt="image" src="https://github.com/user-attachments/assets/2a98ccc4-6f8f-41e6-bc7f-547983629431" />
+<img width="1918" height="992" alt="Game section" src="https://github.com/user-attachments/assets/dfcf0bc9-4738-4ed4-8047-d18af04b63d4" />
+<img width="1919" height="988" alt="Music section" src="https://github.com/user-attachments/assets/6ffbe2c6-696e-4689-8ab1-69ecc725ed51" />
 
 # Download
 Grab the latest installer from the [Releases](https://github.com/Nobuqq/Gumi-RPC/releases)
