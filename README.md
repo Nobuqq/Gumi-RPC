@@ -20,7 +20,7 @@ Grab the latest installer from the [Releases](https://github.com/Nobuqq/Gumi-RPC
 3. In Gumi RPC, go to Settings → Discord Application ID and paste it in.
 4. Keep the Discord desktop app open while you use Gumi RPC.
 That's it — your games and music will show up on your profile.
-# Run it from source 
+# Run it from source (Developer Path)
 You need [Node.js](https://nodejs.org/en) first. Then, in the folder: 
  - npm install
  - npm start
