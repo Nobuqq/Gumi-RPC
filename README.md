@@ -25,7 +25,9 @@ That's it! your games and music will show up on your profile.
 You need [Node.js](https://nodejs.org/en) first. Then, in the folder:
 
 `npm install`
+
 `npm start`
+
 Make the installer (.exe) with:
 
 `npm run build`
