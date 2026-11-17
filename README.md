@@ -15,7 +15,7 @@ Application ID into that game's "Discord Application ID" box.
 
 ## Customize (the Customize tab in the sidebar)
 - Themes: tap any built-in theme (Neutral / Light / Midnight / Custom) or any of your
-  "My themes" to switch to it. Switching never deletes a theme — only the small X on
+  "My themes" to switch to it. Switching never deletes a theme only the small X on
   a theme card deletes that one theme.
 - My themes: "+ Add theme from picture" makes a theme from a picture. Each theme has
   its own accent colour (the colour picker on its card), and the app accent changes
@@ -27,10 +27,10 @@ Application ID into that game's "Discord Application ID" box.
 - Colours: set a colour for Background, Panels, Cards, Text, Muted text, Lines,
   Accent, Highlight, Pink and Green. "Reset colours" goes back to the theme.
 - Icons: the sidebar Games / Music / Settings icons are now your custom silhouettes
-  (`assets/icons/games.png`, `music.png`, `settings.png` — black shapes on a
+  (`assets/icons/games.png`, `music.png`, `settings.png` - black shapes on a
   transparent background, used as a mask). "Icon colour" recolours all three.
 - Neon glow: a toggle that adds a glow to titles and buttons.
-- Accent everywhere: a theme's accent colour now also tints the boxes — theme cards, song and playlist rows, and the player — so the whole app matches the picture.
+- Accent everywhere: a theme's accent colour now also tints the boxes theme cards, song and playlist rows, and the player so the whole app matches the picture.
 
 ## Your art, font, sounds, mascot
 - Font: put it at `assets/fonts/gumi.ttf` (or edit the @font-face line in index.html), or use Customize > Font to pick your own font file in the app
