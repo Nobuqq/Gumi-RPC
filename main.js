@@ -17,7 +17,7 @@ const ICON = path.join(__dirname, 'build', 'icon.ico');
 
 // Create one app at discord.com/developers/applications and paste its Application ID here.
 // It's used for any game that doesn't have its own Client ID.
-const DEFAULT_CLIENT_ID = '1570946148238098633';
+const DEFAULT_CLIENT_ID = 'PUT_YOUR_GUMI_RPC_APPLICATION_ID_HERE';
 const cfgFile = () => path.join(app.getPath('userData'), 'config.json');
 const loadCfg = () => { try { return JSON.parse(fs.readFileSync(cfgFile(), 'utf8')); } catch { return {}; } };
 const clientId = () => String(loadCfg().clientId || DEFAULT_CLIENT_ID).trim(); // Settings wins over the line above
@@ -299,6 +299,14 @@ ipcMain.handle('dialog:icon', async () => {
   if (r.canceled) return null;
   fs.mkdirSync(iconDir(), { recursive: true });
   const dest = path.join(iconDir(), Date.now() + path.extname(r.filePaths[0]));
+  fs.copyFileSync(r.filePaths[0], dest); // keep our own copy so moving the original can't break it
+  return dest;
+});
+ipcMain.handle('dialog:sound', async () => {
+  const r = await dialog.showOpenDialog(win, { properties: ['openFile'], filters: [{ name: 'Sounds', extensions: ['wav', 'mp3', 'ogg', 'm4a', 'flac'] }] });
+  if (r.canceled) return null;
+  const dir = path.join(app.getPath('userData'), 'sfx'); fs.mkdirSync(dir, { recursive: true });
+  const dest = path.join(dir, Date.now() + '-' + path.basename(r.filePaths[0]));
   fs.copyFileSync(r.filePaths[0], dest); // keep our own copy so moving the original can't break it
   return dest;
 });

@@ -38,7 +38,8 @@
     "publish": {
       "provider": "github",
       "owner": "Nobuqq",
-      "repo": "Gumi-RPC"
+      "repo": "Gumi-RPC",
+      "releaseType": "release"
     }
   },
   "author": "Gumi RPC",

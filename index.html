@@ -60,10 +60,6 @@ body.neon button:hover:not(:disabled) { box-shadow:0 0 22px var(--purple),0 0 34
 body.neon .nav.act, body.neon .item.sel { box-shadow:0 0 16px rgba(var(--pr),.7); }
 /* Customize section */
 #customizeBox { display:grid; gap:12px; background:var(--panel); border:2px solid var(--line); border-radius:12px; padding:14px 18px; }
-.cgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px 16px; }
-.cfield { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:15px; color:var(--text); }
-.cfield input[type=color] { width:44px; height:30px; padding:0; border:2px solid var(--line); border-radius:8px; background:var(--bg2); cursor:pointer; }
-.cfield input[type=text] { width:150px; }
 #myThemes { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
 .theme-card { display:grid; gap:6px; padding:8px; border:2px solid var(--line); border-radius:12px; background:var(--bg2); cursor:pointer; text-align:left; }
 .theme-card.act { --base:var(--grad); border-color:var(--hi); box-shadow:0 0 14px rgba(var(--pr),.45); }
@@ -203,7 +199,10 @@ body.playing .cd { animation-play-state:running; }
 .song.now .sb { --base:var(--grad); border-color:var(--hi); }
 .sn { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .sa { color:var(--muted); font-size:14px; }
 .song.now .sa, .sb:hover .sa { color:#fff; } .sx { width:42px; padding:0; } .muted { color:var(--muted); }
-#np { width:min(360px,34vw); border-left:2px solid var(--line); background:var(--panel); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:20px; min-height:0; overflow:auto; }
+#np { width:min(360px,34vw); border-left:2px solid var(--line); background:var(--panel); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:12px; padding:20px; min-height:0; overflow:auto; }
+#npUp { flex:1; min-height:0; width:100%; overflow:auto; border-top:2px solid var(--line); padding-top:10px; }
+.npUpHead { display:flex; justify-content:space-between; align-items:center; font-size:16px; margin-bottom:6px; }
+.npUpHead button { padding:2px 10px; font-size:13px; }
 #npTitle { font-size:28px; color:var(--pink); text-shadow:0 0 16px rgba(255,79,163,.6); text-align:center; word-break:break-word; } #npBy { color:var(--muted); }
 .ctl { display:flex; align-items:center; gap:14px; }
 .volrow { display:flex; align-items:center; gap:10px; width:100%; } .volrow svg { width:26px; height:26px; fill:currentColor; flex:none; } .volrow input { flex:1; }
@@ -284,12 +283,12 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
           <div id="songs"></div></section>
         <aside id="np" class="off"><div class="cd big"></div><div id="npTitle">Title</div><div id="npBy">By author</div>
           <div class="tl"><span class="js-cur">0:00</span><input class="js-seek" type="range" min="0" max="1000" value="0" aria-label="Seek"><span class="js-dur">0:00</span></div><div class="ctl"><button class="skip js-shuf" aria-label="Shuffle"></button><button class="skip js-prev" aria-label="Previous song"><svg viewBox="0 0 24 24"><path d="M5 5h2.6v14H5zM20 5v14L9 12z"/></svg></button><button class="pp js-pp" aria-label="Play or pause"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><button class="skip js-next" aria-label="Next song"><svg viewBox="0 0 24 24"><path d="M16.4 5H19v14h-2.6zM4 5v14l11-7z"/></svg></button><button class="skip js-loop" aria-label="Loop"></button></div>
-          <div class="volrow"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9z"/><path d="M15.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input class="js-vol" type="range" min="0" max="100" value="70" aria-label="Volume"></div></aside>
+          <div class="volrow"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9z"/><path d="M15.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input class="js-vol" type="range" min="0" max="100" value="70" aria-label="Volume"></div>
+          <div id="npUp"><div class="npUpHead">Up next <button id="npQueueClear">Clear</button></div><div id="npQueue"></div></div></aside>
       </div>
       <div id="settingsView" class="off"><div class="box">
         <h2>Settings</h2>
         <label class="srow"><span>Open Gumi RPC when my PC starts<small>Starts the launcher after you log in to Windows</small></span><span class="sw"><input type="checkbox" id="s-start"><i></i></span></label>
-        <label class="srow"><span>Sound effects<small>Gumi’s voice blips, clicks and launch sounds</small></span><span class="sw"><input type="checkbox" id="s-sfx"><i></i></span></label>
         <label class="srow"><span>Retro scanlines<small>The faint TV lines over the whole app</small></span><span class="sw"><input type="checkbox" id="s-scan"><i></i></span></label>
         <label class="srow"><span>Discord Application ID<small>The long number from your application’s General Information page. Needed for sign-in and music</small></span><input type="text" id="s-appid" style="width:230px" placeholder="123456789012345678"></label>
         <label class="srow"><span>Show what I’m listening to on Discord<small>Your current song appears as “Listening to…” when no game is running</small></span><span class="sw"><input type="checkbox" id="s-music"><i></i></span></label>
@@ -315,32 +314,20 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
             <label class="dimr" style="margin-top:8px">Font size <input type="range" id="s-fontsize" min="12" max="22" value="16"><span id="fontSizeVal">16</span></label>
           </div>
           <div>
-            <div class="shead">Colours<small>Set a colour for every part of the app. These override the theme until you reset them.</small></div>
-            <div class="cgrid">
-              <label class="cfield">Background <input type="color" id="c-bg"></label>
-              <label class="cfield">Panels <input type="color" id="c-bg2"></label>
-              <label class="cfield">Cards / sidebar <input type="color" id="c-panel"></label>
-              <label class="cfield">Text <input type="color" id="c-text"></label>
-              <label class="cfield">Muted text <input type="color" id="c-muted"></label>
-              <label class="cfield">Lines / borders <input type="color" id="c-line"></label>
-              <label class="cfield">Accent (purple) <input type="color" id="c-purple"></label>
-              <label class="cfield">Highlight (cyan) <input type="color" id="c-cyan"></label>
-              <label class="cfield">Pink <input type="color" id="c-pink"></label>
-              <label class="cfield">Green <input type="color" id="c-green"></label>
-            </div>
-            <div class="pick" style="margin-top:8px"><button id="colorsReset">Reset colours</button></div>
-          </div>
-          <div>
             <div class="shead">Icons<small>Your custom silhouettes, recoloured here. Games, Music and Settings in the sidebar.</small></div>
             <div class="iconprev"><span class="ni sil" style="--icon:url('assets/icons/games.png')"></span><span class="ni sil" style="--icon:url('assets/icons/music.png')"></span><span class="ni sil" style="--icon:url('assets/icons/settings.png')"></span><label class="cfield" style="flex:1">Icon colour <input type="color" id="c-icon"></label><button id="iconReset">Reset</button></div>
           </div>
           <div>
             <div class="shead">Theme<small>Tap a theme to switch to it — you never have to delete one to change it. The accent colour changes with the theme.</small></div>
             <div id="themes"><button data-t="neutral">Neutral</button><button data-t="light">Light</button><button data-t="midnight">Midnight</button></div>
-            <div class="shead" style="margin-top:10px">My themes<small>Add a picture as a theme — the accent colour is picked from the picture automatically, and you can change it on the card if you like. Best picture ratio is 16:9 (1920×1080). If a picture does not fit, change Fit / Position / Zoom below — Cover fills the box (crops the edges), Contain shows the whole picture.</small></div>
+            <div class="shead" style="margin-top:10px">My themes<small>Add a picture as a theme — the whole interface takes its colours from the picture automatically, and you can change the accent on the card if you like. Best picture ratio is 16:9 (1920×1080). If a picture does not fit, change Fit / Position / Zoom below — Cover fills the box (crops the edges), Contain shows the whole picture.</small></div>
             <div id="myThemes"></div>
             <div class="pick" style="margin-top:8px"><button id="addTheme">+ Add theme from picture</button></div>
             <div id="themeEditor" class="off"></div>
+          </div>
+          <div>
+            <div class="shead">Sound effects<small>Pick your own sounds for each moment — hover a row to hear it, and set any volume you like. Volume 0 silences that sound.</small></div>
+            <div id="sndRows"></div>
           </div>
         </div>
       </div></div>
@@ -397,7 +384,7 @@ var GUMI_SVG = '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><c
 // Drop your own Gumi art at assets/gumi.png and it replaces this ball automatically
 var GUMI = '<img src="assets/gumi.png" alt="" style="image-rendering:pixelated" onerror="this.outerHTML=GUMI_SVG">';
 const $ = (s) => document.querySelector(s);
-const sfx = (n) => { if (!S.sfx) return; const a = new Audio(`assets/sfx/${n}.wav`); a.volume = .6; a.play().catch(() => {}); }; // click, launch, blip
+const sfx = (n) => { const s = S.sounds[n]; if (!s || !s.vol) return; const a = new Audio(s.file ? fileUrl(s.file) : `assets/sfx/${n}.wav`); a.volume = s.vol / 100; a.play().catch(() => {}); }; // click, launch — your own file + any volume (0 = silent)
 const fileUrl = (p) => { const s = p.replace(/\\/g, '/').split('/'); return 'file:///' + s[0] + '/' + s.slice(1).map(encodeURIComponent).join('/'); };
 const iconUrl = (p) => p ? fileUrl(p) : '';
 document.querySelectorAll('[data-gumi]').forEach((e) => e.innerHTML = GUMI);
@@ -711,8 +698,11 @@ async function startTrack(t) {
 function renderQueue() {
   const n = upNext.length;
   $('#queueCount').textContent = n; $('#queueCount').classList.toggle('off', !n);
-  const L = $('#queueList'); L.innerHTML = '';
-  if (!n) { const p = document.createElement('p'); p.className = 'muted'; p.style.margin = '4px'; p.textContent = 'Nothing queued yet. Right-click a song to add it here.'; L.append(p); return; }
+  renderQueueInto($('#queueList')); renderQueueInto($('#npQueue')); // mini player popup + big player panel
+}
+function renderQueueInto(L) {
+  if (!L) return; L.innerHTML = '';
+  if (!upNext.length) { const p = document.createElement('p'); p.className = 'muted'; p.style.margin = '4px'; p.textContent = 'Nothing queued yet. Right-click a song to add it here.'; L.append(p); return; }
   upNext.forEach((id, i) => {
     const t = byId(id); if (!t) return;
     const r = document.createElement('div'); r.className = 'qrow';
@@ -723,6 +713,7 @@ function renderQueue() {
 }
 $('#queueBtn').onclick = (e) => { e.stopPropagation(); sfx('click'); $('#queuePanel').classList.toggle('open'); };
 $('#queueClear').onclick = () => { upNext = []; renderQueue(); toast('Queue cleared'); };
+$('#npQueueClear').onclick = () => { upNext = []; renderQueue(); toast('Queue cleared'); };
 document.addEventListener('click', (e) => { if (!e.target.closest('#queuePanel') && !e.target.closest('#queueBtn')) $('#queuePanel').classList.remove('open'); });
 
 /* right-click a song: play next, add to queue, or add to a playlist */
@@ -830,40 +821,52 @@ $('#pform').onsubmit = (e) => {
   view = curPl.id; persist(); sfx('click'); closePl(); renderMusic();
 };
 /* settings */
-const S = Object.assign({ sfx: true, scan: true, musicRpc: true, cdImage: 'cd', cdUpload: false, theme: 'neutral', pics: [], dim: 55,
+const S = Object.assign({ scan: true, musicRpc: true, cdImage: 'cd', cdUpload: false, theme: 'neutral', pics: [], dim: 55,
   neon: false, fontFile: '', fontSize: 16, iconColor: '', colors: {}, customThemes: [], activeTheme: '', artistName: true, miniPos: null },
   JSON.parse(localStorage.getItem('gumi-settings') || '{}'));
-S.colors = S.colors || {}; S.customThemes = S.customThemes || [];
+delete S.colors; // colours now come from the theme only — old per-part picks are dropped so they can't contradict the theme
+S.customThemes = S.customThemes || [];
+// Custom sound effects: one file + any volume (0 = silent) per sound.
+// Old installs only had one on/off switch (S.sfx) — if it was off, silence everything.
+// The mascot voice (blip) was removed — Gumi only talks in a small part of the app.
+S.sounds = S.sounds || {}; delete S.sounds.blip;
+['click', 'launch'].forEach((n) => { const s = S.sounds[n] || {}; S.sounds[n] = { file: typeof s.file === 'string' ? s.file : '', vol: typeof s.vol === 'number' ? s.vol : (S.sfx === false ? 0 : 60) }; });
 const saveS = () => localStorage.setItem('gumi-settings', JSON.stringify(S));
 let picI = 0, picT = null;
 const hexRgb = (h) => { const n = parseInt(String(h || '#8b4dff').slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(','); };
 const shade = (h, p) => { const [r, g, b] = hexRgb(h).split(',').map(Number); const t = p < 0 ? 0 : 255, a = Math.abs(p) / 100;
   return '#' + [r, g, b].map((v) => Math.round((t - v) * a + v).toString(16).padStart(2, '0')).join(''); };
+/* The interface colours, and their defaults (the neutral theme).
+   A custom theme's palette (taken from its picture) sets every colour —
+   there are no per-part overrides any more, so the theme can't contradict
+   itself and the text stays readable. */
+const themeDefaults = { bg: '#0a0b18', bg2: '#10132b', panel: '#141830', text: '#e8eaf8', muted: '#8c93b8', line: '#2d3560', purple: '#8b4dff', cyan: '#3be8ff', pink: '#ff4fa3', green: '#39e08a' };
+let themePalette = null; // the active custom theme's palette from its picture, or null for built-in themes
 function applyTheme() {
   document.body.dataset.theme = S.theme; clearInterval(picT); const bg = $('#bgpics');
   $('#bgdim').style.setProperty('--dim', S.dim / 100);
   const ct = S.theme === 'custom' ? S.customThemes.find((t) => t.id === S.activeTheme) : null;
   if (ct) {
     const acc = ct.accent || '#8b4dff';
+    themePalette = ct.palette ? { ...ct.palette, accent: acc } : null;
     document.body.style.setProperty('--purple', acc); document.body.style.setProperty('--pr', hexRgb(acc));
     document.body.style.setProperty('--grad', `linear-gradient(180deg, ${shade(acc, 25)}, ${shade(acc, -25)})`);
     document.body.style.setProperty('--hi', shade(acc, 45));
+    if (themePalette) ['bg', 'bg2', 'panel', 'text', 'muted', 'line', 'cyan', 'pink', 'green'].forEach((k) => document.body.style.setProperty('--' + k, themePalette[k]));
+    else paletteFromImage(ct.image).then((pal) => { ct.palette = pal; saveS(); applyS(); }); // theme from before palettes existed: take its colours once, then apply them
     bg.style.backgroundImage = `url("${fileUrl(ct.image)}")`;
     bg.style.backgroundSize = ct.fit === 'contain' ? 'contain' : ct.fit === 'fill' ? '100% 100%' : (ct.zoom && ct.zoom !== 100 ? ct.zoom + '%' : 'cover');
     bg.style.backgroundPosition = ct.pos || 'center'; bg.style.backgroundRepeat = 'no-repeat'; bg.style.opacity = 1;
     return;
   }
-  ['--purple', '--pr', '--grad', '--hi'].forEach((v) => document.body.style.removeProperty(v));
+  themePalette = null;
+  // a custom theme's palette was set inline — clear it so the built-in theme's own colours show
+  ['--purple', '--pr', '--grad', '--hi', '--bg', '--bg2', '--panel', '--text', '--muted', '--line', '--cyan', '--pink', '--green'].forEach((v) => document.body.style.removeProperty(v));
   const pics = S.theme === 'custom' ? S.pics : [];
   if (!pics.length) { bg.style.backgroundImage = ''; bg.style.backgroundSize = ''; bg.style.backgroundPosition = ''; return; }
   bg.style.backgroundSize = 'cover'; bg.style.backgroundPosition = 'center';
   const show = () => { bg.style.opacity = 0; setTimeout(() => { bg.style.backgroundImage = `url("${fileUrl(pics[picI % pics.length])}")`; bg.style.opacity = 1; picI++; }, 600); };
   picI = 0; show(); if (pics.length > 1) picT = setInterval(show, 15000);
-}
-function applyColors() {
-  const map = { bg: '--bg', bg2: '--bg2', panel: '--panel', text: '--text', muted: '--muted', line: '--line', purple: '--purple', cyan: '--cyan', pink: '--pink', green: '--green' };
-  Object.entries(map).forEach(([k, v]) => { if (S.colors[k]) document.body.style.setProperty(v, S.colors[k]); else if (k !== 'purple') document.body.style.removeProperty(v); });
-  if (S.colors.purple) { document.body.style.setProperty('--pr', hexRgb(S.colors.purple)); document.body.style.setProperty('--hi', shade(S.colors.purple, 45)); }
 }
 function applyFont() {
   let st = $('#fontStyle');
@@ -877,9 +880,8 @@ function applyFont() {
   const fv = $('#fontSizeVal'); if (fv) fv.textContent = String(S.fontSize || 16);
 }
 function applyIconColor() { document.body.style.setProperty('--iconColor', S.iconColor || ''); }
-const applyS = () => { document.body.classList.toggle('noscan', !S.scan); document.body.classList.toggle('neon', !!S.neon); applyTheme(); applyColors(); applyFont(); applyIconColor(); };
-$('#s-sfx').checked = S.sfx; $('#s-scan').checked = S.scan; applyS();
-$('#s-sfx').onchange = (e) => { S.sfx = e.target.checked; saveS(); };
+const applyS = () => { document.body.classList.toggle('noscan', !S.scan); document.body.classList.toggle('neon', !!S.neon); applyTheme(); applyFont(); applyIconColor(); };
+$('#s-scan').checked = S.scan; applyS();
 $('#s-scan').onchange = (e) => { S.scan = e.target.checked; saveS(); applyS(); };
 api.getStartup().then((v) => { $('#s-start').checked = v; });
 $('#s-start').onchange = async (e) => { const on = await api.setStartup(e.target.checked); e.target.checked = on; toast(on ? 'Gumi RPC will open when your PC starts' : 'Gumi RPC won’t open at startup'); };
@@ -896,13 +898,18 @@ $('#s-cdup').checked = S.cdUpload; $('#s-cdup').onchange = (e) => { S.cdUpload =
 $('#s-cd').value = S.cdImage; $('#s-cd').onchange = (e) => { S.cdImage = e.target.value.trim(); saveS(); pushPresence(); };
 $('#s-music').checked = S.musicRpc; $('#s-music').onchange = (e) => { S.musicRpc = e.target.checked; saveS(); pushPresence(); };
 $('#s-artist').checked = S.artistName !== false; $('#s-artist').onchange = (e) => { S.artistName = e.target.checked; saveS(); pushPresence(); };
-/* Pick an accent colour from a picture: the most vibrant colour in it.
-   The picture is shrunk to 48x48, sampled, and colours are grouped by hue —
-   the group with the most saturated, bright pixels wins, and its average
-   colour becomes the accent. Grey, near-black and near-white pixels are
-   skipped so a dark photo doesn't end up with a grey accent. Falls back
-   to the default purple if the picture can't be read. */
-function accentFromImage(path) {
+/* Pick a full interface palette from a picture: the accent is the most
+   vibrant colour in it, the background is its darkest tone (darkened
+   further if it comes out mid-grey), and the other colours come from the
+   picture's other colour groups. Every colour is then checked so the
+   text stays readable: the text colour is the one that reads best on
+   every surface, and the accent and the other colours are pulled toward
+   it until they read too. The picture is shrunk to 48x48, sampled, and
+   colours are grouped by hue — the group with the most saturated, bright
+   pixels wins the accent. Grey, near-black and near-white pixels are
+   skipped for the accent so a dark photo doesn't end up with a grey
+   accent. Falls back to the default palette if the picture can't be read. */
+function paletteFromImage(path) {
   return new Promise((res) => {
     const img = new Image();
     img.onload = () => {
@@ -910,24 +917,57 @@ function accentFromImage(path) {
         const c = document.createElement('canvas'); const s = 48; c.width = s; c.height = s;
         const g = c.getContext('2d'); g.drawImage(img, 0, 0, s, s);
         const d = g.getImageData(0, 0, s, s).data, buckets = new Map();
+        let darkR = 0, darkG = 0, darkB = 0, darkN = 0;
         for (let i = 0; i < d.length; i += 16) {
           const r = d[i], gg = d[i + 1], b = d[i + 2], a = d[i + 3]; if (a < 128) continue;
           const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), sat = mx ? (mx - mn) / mx : 0, val = mx / 255;
+          if (val < .4) { darkR += r; darkG += gg; darkB += b; darkN++; }
           if (sat < .3 || val < .18 || val > .96) continue;
           let hue = 0;
           if (mx === r) hue = ((gg - b) / (mx - mn || 1)) % 6;
           else if (mx === gg) hue = (b - r) / (mx - mn || 1) + 2;
           else hue = (r - gg) / (mx - mn || 1) + 4;
-          const k = Math.round((((hue * 60) + 360) % 360) / 30), e = buckets.get(k) || { r: 0, g: 0, b: 0, n: 0, s: 0 };
+          const k = Math.round((((hue * 60) + 360) % 360) / 30), e = buckets.get(k) || { r: 0, g: 0, b: 0, n: 0, s: 0, k };
           e.r += r; e.g += gg; e.b += b; e.n++; e.s += sat * val; buckets.set(k, e);
         }
-        let best = null;
-        buckets.forEach((e) => { const score = e.s * Math.sqrt(e.n); if (!best || score > best.score) best = { ...e, score }; });
-        if (!best) return res('#8b4dff');
-        res('#' + [best.r / best.n, best.g / best.n, best.b / best.n].map((v) => Math.round(v).toString(16).padStart(2, '0')).join(''));
-      } catch { res('#8b4dff'); }
+        const hex = (r, g, b) => '#' + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+        const ranked = [...buckets.values()].map((e) => ({ ...e, score: e.s * Math.sqrt(e.n), hex: hex(e.r / e.n, e.g / e.n, e.b / e.n) })).sort((a, b) => b.score - a.score);
+        const accent = ranked[0] ? ranked[0].hex : '#8b4dff';
+        const accentK = ranked[0] ? ranked[0].k : -1;
+        const pickHue = (ks, fallback) => { let best = null; ranked.forEach((e) => { if (e.k === accentK || !ks.includes(e.k)) return; if (!best || e.score > best.score) best = e; }); return best ? best.hex : fallback; };
+        const lum = (h) => { const [r, g, b] = hexRgb(h).split(',').map(Number); const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b); };
+        const contrast = (a, b) => { const l1 = lum(a), l2 = lum(b); return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05); };
+        const mix = (a, b, t) => { const [r1, g1, b1] = hexRgb(a).split(',').map(Number), [r2, g2, b2] = hexRgb(b).split(',').map(Number); return hex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t); };
+        // Keep the interface dark like the app itself: if the picture's
+        // darkest tone is mid-grey, darken it until it's properly dark,
+        // so the text always sits on a dark surface.
+        let bg = darkN >= 8 ? hex(darkR / darkN, darkG / darkN, darkB / darkN) : shade(accent, -82);
+        let guard = 0; while (lum(bg) > 0.12 && guard++ < 20) bg = shade(bg, -25);
+        let bg2 = shade(bg, 10), panel = shade(bg, 18);
+        // Pick the text colour (light or dark) that reads best on every
+        // surface it sits on — background, buttons and panels. If neither
+        // reads well enough, pull the panels back toward the background.
+        const light = '#e8eaf8', darkT = '#1d1640';
+        const worst = (t) => Math.min(contrast(t, bg), contrast(t, bg2), contrast(t, panel));
+        if (Math.max(worst(light), worst(darkT)) < 3.5) { panel = mix(panel, bg, 0.8); bg2 = mix(bg2, bg, 0.6); }
+        const text = worst(light) >= worst(darkT) ? light : darkT;
+        // The accent is a background too (active nav buttons, the Play
+        // button) — darken or lighten it until the text on it reads.
+        let acc = accent;
+        const accTarget = text === light ? '#000000' : '#ffffff';
+        guard = 0; while (contrast(acc, text) < 2.5 && guard++ < 12) acc = mix(acc, accTarget, 0.25);
+        // The other colours are text as well (song titles, highlights, the
+        // small muted descriptions) — pull each toward the text colour
+        // until it reads on every surface.
+        const readable = (col) => { let c = col; let g2 = 0; while (Math.min(contrast(c, bg), contrast(c, panel)) < 3 && g2++ < 12) c = mix(c, text, 0.25); return c; };
+        res({
+          accent: acc, bg, bg2, panel,
+          text, muted: readable(mix(text, bg, 0.4)), line: mix(bg, text, 0.22),
+          cyan: readable(pickHue([5, 6, 7, 8], '#3be8ff')), pink: readable(pickHue([10, 11, 0], '#ff4fa3')), green: readable(pickHue([3, 4, 5], '#39e08a')),
+        });
+      } catch { res({ ...themeDefaults, accent: '#8b4dff' }); }
     };
-    img.onerror = () => res('#8b4dff');
+    img.onerror = () => res({ ...themeDefaults, accent: '#8b4dff' });
     img.src = fileUrl(path);
   });
 }
@@ -974,7 +1014,7 @@ function renderMyThemes() {
   const ar = document.createElement('label'); ar.className = 'erow'; ar.textContent = 'Auto accent from picture ';
   const ac = document.createElement('input'); ac.type = 'checkbox'; ac.checked = ct.autoAccent !== false;
   ac.title = 'When on, the accent colour is picked from this theme’s picture. Turn it off to keep the colour you picked yourself.';
-  ac.onchange = async () => { ct.autoAccent = ac.checked; if (ac.checked) ct.accent = await accentFromImage(ct.image); saveS(); applyS(); themeUI(); toast(ac.checked ? 'Accent matched to the picture' : 'Accent set by hand — pick a colour on the card'); };
+  ac.onchange = async () => { ct.autoAccent = ac.checked; if (ac.checked) { const pal = await paletteFromImage(ct.image); ct.accent = pal.accent; ct.palette = pal; } saveS(); applyS(); themeUI(); toast(ac.checked ? 'Colours matched to the picture' : 'Accent set by hand — pick a colour on the card'); };
   ar.append(ac); ed.append(ar);
   const note = document.createElement('p'); note.className = 'muted'; note.style.cssText = 'margin:0;font-size:13px';
   note.textContent = 'Tip: 16:9 pictures (1920x1080) fit best. Cover fills the screen and crops the edges; Contain shows the whole picture with bars.'; ed.append(note);
@@ -985,9 +1025,9 @@ function themeUI() {
 }
 all('#themes button').forEach((b) => b.onclick = () => { sfx('click'); S.theme = b.dataset.t; if (b.dataset.t !== 'custom') S.activeTheme = ''; saveS(); applyS(); themeUI(); });
 $('#addTheme').onclick = async () => { const r = await api.pickPics(); if (!r.length) return;
-  r.forEach((p) => { const t = { id: crypto.randomUUID(), name: p.split(/[\\/]/).pop().replace(/\.[^.]+$/, ''), image: p, accent: '#8b4dff', autoAccent: true, fit: 'cover', pos: 'center', zoom: 100, ratio: '16:9' };
+  r.forEach((p) => { const t = { id: crypto.randomUUID(), name: p.split(/[\\/]/).pop().replace(/\.[^.]+$/, ''), image: p, accent: '#8b4dff', palette: null, autoAccent: true, fit: 'cover', pos: 'center', zoom: 100, ratio: '16:9' };
     S.customThemes.push(t);
-    accentFromImage(p).then((acc) => { t.accent = acc; saveS(); applyS(); themeUI(); }); // accent matched to the picture, automatically
+    paletteFromImage(p).then((pal) => { t.accent = pal.accent; t.palette = pal; saveS(); applyS(); themeUI(); }); // colours matched to the picture, automatically
   });
   S.theme = 'custom'; S.activeTheme = S.customThemes[S.customThemes.length - 1].id; saveS(); applyS(); themeUI(); toast('Theme added — its accent colour was picked from the picture'); };
 
@@ -995,18 +1035,32 @@ $('#s-neon').checked = !!S.neon; $('#s-neon').onchange = (e) => { S.neon = e.tar
 $('#s-fontsize').value = S.fontSize || 16; $('#s-fontsize').oninput = (e) => { S.fontSize = +e.target.value; saveS(); applyFont(); };
 $('#pickFont').onclick = async () => { const p = await api.pickFont(); if (p) { S.fontFile = p; saveS(); applyFont(); toast('Font changed'); } };
 $('#fontReset').onclick = () => { S.fontFile = ''; S.fontSize = 16; saveS(); applyFont(); $('#s-fontsize').value = 16; toast('Font reset'); };
-const colorMap = { 'c-bg': 'bg', 'c-bg2': 'bg2', 'c-panel': 'panel', 'c-text': 'text', 'c-muted': 'muted', 'c-line': 'line', 'c-purple': 'purple', 'c-cyan': 'cyan', 'c-pink': 'pink', 'c-green': 'green' };
-const themeDefaults = { bg: '#0a0b18', bg2: '#10132b', panel: '#141830', text: '#e8eaf8', muted: '#8c93b8', line: '#2d3560', purple: '#8b4dff', cyan: '#3be8ff', pink: '#ff4fa3', green: '#39e08a' };
-Object.entries(colorMap).forEach(([id, k]) => { const el = document.getElementById(id); if (!el) return; el.value = S.colors[k] || themeDefaults[k];
-  el.onchange = () => { S.colors[k] = el.value; saveS(); applyS(); }; });
-$('#colorsReset').onclick = () => { S.colors = {}; saveS(); applyS(); Object.entries(colorMap).forEach(([id, k]) => { const el = document.getElementById(id); if (el) el.value = themeDefaults[k]; }); toast('Colours reset to the theme'); };
 const icEl = $('#c-icon'); if (icEl) { icEl.value = S.iconColor || '#e8eaf8'; icEl.onchange = () => { S.iconColor = icEl.value; saveS(); applyIconColor(); }; }
 $('#iconReset').onclick = () => { S.iconColor = ''; saveS(); applyIconColor(); const el = $('#c-icon'); if (el) el.value = '#e8eaf8'; };
 $('#s-cdtest').onclick = async () => { const d = await api.musicDiag(); if (!d || !d.image) return toast('No song is playing right now - play a song, then check again');
   const msg = d.kind === 'link' ? 'Discord is being asked for this link: ' + d.image + '. Discord fetches it through its own image proxy, so a new GIF can take a few minutes to appear, and some hosts are blocked. If it never appears, try a different direct GIF link instead.'
     : 'Discord is being asked for the asset named "' + d.image + '". That name must exist under Rich Presence > Art Assets in the Developer Portal for this Application ID. Discord shows uploaded assets as still pictures - a GIF uploaded there will not animate.';
   toast(msg); try { await api.openLog(); } catch {} };
-themeUI(); applyS();
+/* Custom sound effects: one file + any volume per sound (click, launch, mascot blip).
+   Hover a row to hear it. Volume 0 silences that sound — that replaces the old on/off switch. */
+const SOUNDS = [['click', 'Click', 'Played when you tap buttons and open things'], ['launch', 'Launch', 'Played when a game starts']];
+function sndUI() {
+  const w = $('#sndRows'); if (!w) return; w.innerHTML = '';
+  SOUNDS.forEach(([n, label, desc]) => {
+    const s = S.sounds[n];
+    const row = document.createElement('div'); row.className = 'srow'; row.title = 'Hover to hear it';
+    row.innerHTML = `<span>${label}<small>${desc}</small></span><span class="pick"><button data-act="pick">Choose file</button><span class="muted sndname"></span><label class="dimr">Volume <input type="range" min="0" max="100" value="${s.vol}"><span class="sndvol">${s.vol}%</span></label><button data-act="reset">Reset</button></span>`;
+    row.querySelector('.sndname').textContent = s.file ? s.file.split(/[\\/]/).pop() : 'Default sound';
+    row.onmouseenter = () => sfx(n);
+    row.querySelector('[data-act="pick"]').onclick = async () => { const p = await api.pickSound(); if (p) { S.sounds[n].file = p; saveS(); sndUI(); sfx(n); } };
+    row.querySelector('[data-act="reset"]').onclick = () => { S.sounds[n].file = ''; S.sounds[n].vol = 60; saveS(); sndUI(); };
+    const vol = row.querySelector('input[type="range"]');
+    vol.oninput = () => { S.sounds[n].vol = +vol.value; row.querySelector('.sndvol').textContent = vol.value + '%'; saveS(); };
+    vol.onchange = () => sfx(n);
+    w.appendChild(row);
+  });
+}
+themeUI(); sndUI(); applyS();
 
 /* Gumi: visual-novel dialogue */
 const vn = $('#vn'), txt = $('#txt'), nx = $('#nxt2'); let finish = null, adv = null;
@@ -1014,7 +1068,7 @@ function type(t) {
   return new Promise((res) => {
     txt.textContent = ''; let i = 0; vn.classList.add('talking');
     const done = () => { clearInterval(iv); txt.textContent = t; vn.classList.remove('talking'); finish = null; res(); };
-    const iv = setInterval(() => { txt.textContent += t[i++]; if (i % 2) sfx('blip'); if (i >= t.length) done(); }, 26); finish = done;
+    const iv = setInterval(() => { txt.textContent += t[i++]; if (i >= t.length) done(); }, 26); finish = done;
   });
 }
 const wait = () => new Promise((res) => { nx.style.visibility = 'visible'; adv = () => { nx.style.visibility = 'hidden'; adv = null; res(); }; });

@@ -17,24 +17,29 @@ Application ID into that game's "Discord Application ID" box.
 - Themes: tap any built-in theme (Neutral / Light / Midnight / Custom) or any of your
   "My themes" to switch to it. Switching never deletes a theme — only the small X on
   a theme card deletes that one theme.
-- My themes: "+ Add theme from picture" makes a theme from a picture. Each theme has
-  its own accent colour (the colour picker on its card), and the app accent changes
-  with the theme. Best picture ratio is 16:9 (1920x1080). If a picture does not fit,
-  use the editor under the themes: Fit (Cover fills the box and crops the edges,
-  Contain shows the whole picture), Position, Zoom, and Picture ratio.
+- My themes: "+ Add theme from picture" makes a theme from a picture. The whole
+  interface takes its colours from the picture — background, panels, text, accent
+  and the rest — so the app looks like the theme. Each theme also has its own
+  accent colour (the colour picker on its card). Best picture ratio is 16:9
+  (1920x1080). If a picture does not fit, use the editor under the themes: Fit
+  (Cover fills the box and crops the edges, Contain shows the whole picture),
+  Position, Zoom, and Picture ratio.
 - Fonts: "Choose font file" picks a .ttf / .otf / .woff file, and the size slider
   changes the font size. "Reset font" goes back to the default.
-- Colours: set a colour for Background, Panels, Cards, Text, Muted text, Lines,
-  Accent, Highlight, Pink and Green. "Reset colours" goes back to the theme.
+- Colours: there are no colour pickers any more — the theme sets every colour
+  itself (background, panels, text, accent and the rest), and the app checks
+  that the text stays readable on every part, so a theme can never make the
+  text unreadable.
 - Icons: the sidebar Games / Music / Settings icons are now your custom silhouettes
   (`assets/icons/games.png`, `music.png`, `settings.png` — black shapes on a
   transparent background, used as a mask). "Icon colour" recolours all three.
 - Neon glow: a toggle that adds a glow to titles and buttons.
 - Accent everywhere: a theme's accent colour now also tints the boxes — theme cards, song and playlist rows, and the player — so the whole app matches the picture.
+- Sound effects: in Customize, each sound (Click, Launch) has its own row. "Choose file" picks your own sound file for it (it gets copied into the app's data folder, so moving the original won't break it), the slider sets its volume to anything from 0 to 100 (0 silences that sound), and hovering a row plays it so you can hear it. "Reset" goes back to the built-in sound at volume 60.
 
 ## Your art, font, sounds, mascot
 - Font: put it at `assets/fonts/gumi.ttf` (or edit the @font-face line in index.html), or use Customize > Font to pick your own font file in the app
-- Sounds: `assets/sfx/click.wav`, `launch.wav`, `blip.wav` (blip plays as the mascot talks)
+- Sounds: the built-in sounds are `assets/sfx/click.wav` and `launch.wav`. To use your own, go to Customize > Sound effects and pick a file for each sound — the volume slider there sets any volume from 0 (silent) to 100.
 - Gumi (the ball mascot): drawn in code by default; drop your own art at `assets/gumi.png` to replace him
 - Gumi’s tutorial words: edit the `TOUR` list and `intro()` near the bottom of index.html
 
@@ -58,7 +63,7 @@ Then click the avatar button in the app and choose "Sign in with Discord". It st
 ## Music
 Music view > "Add Music" picks a folder of songs. Run `npm install` once so song titles, artists and album art can be read.
 
-The player at the bottom grows into a full-width bar in the Music view and shrinks back to a floating pill in the other views. The bar spans only the track list — it starts at the sidebar and stops before the Now Playing panel, so it never covers your profile or the big CD. In pill form you can drag it anywhere on screen (it remembers where you put it — double-click it to put it back in the middle). Right-click any song for Play next / Add to queue / Add to playlist, and the queue button in the player (with a count) shows what's up next.
+The player at the bottom grows into a full-width bar in the Music view and shrinks back to a floating pill in the other views. The bar spans only the track list — it starts at the sidebar and stops before the Now Playing panel, so it never covers your profile or the big CD. In pill form you can drag it anywhere on screen (it remembers where you put it — double-click it to put it back in the middle). Right-click any song for Play next / Add to queue / Add to playlist, and the queue button in the player (with a count) shows what's up next. The Now Playing panel on the right also has its own Up next list at the bottom, showing the same queued songs — remove one with the ✕ or clear them all — so the queue is on both the mini player and the big player.
 
 ## Marketplace (coming soon)
 The Marketplace tab in the sidebar is ready for when the store opens: theme packs made by other people, with a different picture for each part of the app (background, sidebar, panels) and their own sound effects.
