@@ -22,7 +22,9 @@ Your multitasking app that lets you run your games and music from one place, wit
 That's it! your games and music will show up on your profile.
 
 # Run it from source (Developer Path)
-You need [Node.js](https://nodejs.org/en) first. Then, in the folder:
+You need [Node.js](https://nodejs.org/en) first. 
+Then, in the folder:
+
 `npm install`
 `npm start`
 Make the installer (.exe) with:
