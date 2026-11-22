@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell, safeStorage, nativeImage } = require('electron');
 const { makeCdGif, CD_SIZE } = require('./cdgif');
+const { fetchLyrics } = require('./lyrics');
+const { readZip } = require('./zipread'); // theme packages: minimal zip reader
 const http = require('http');
 const crypto = require('crypto');
 const { Client } = require('@xhayper/discord-rpc');
@@ -13,6 +15,9 @@ let autoUpdater = null;
 try { ({ autoUpdater } = require('electron-updater')); } catch {}
 // same data folder whether you run with npm start or the installed .exe
 app.setPath('userData', path.join(app.getPath('appData'), 'gumi-rpc'));
+// Theme packages can play a startup song when the app opens — Chromium
+// blocks audio before any user gesture by default, so allow it.
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 const ICON = path.join(__dirname, 'build', 'icon.ico');
 
 // Create one app at discord.com/developers/applications and paste its Application ID here.
@@ -85,6 +90,7 @@ const cdLoad = () => { try { return JSON.parse(fs.readFileSync(cdCacheFile(), 'u
 const sha1 = (b) => crypto.createHash('sha1').update(b).digest('hex');
 const note = (msg) => win?.webContents.send('toast', msg);
 const cdByReq = new Map(), cdByArt = new Map(), cdDone = new Map(); let cdCooldown = 0;
+const coverByReq = new Map(), coverByArt = new Map(), coverDone = new Map(); // the still cover (CD Rich Presence off), same shape as the CD maps
 const cdKey = (m) => (m.coverFile ? 'c|' + m.coverFile : 'f|' + m.file);
 
 async function getArt(m) { // the album's own cover picture, else the picture inside the song file
@@ -158,6 +164,33 @@ function cdUrl(m) { // resolves to the hosted GIF link, or null if there's no co
     .catch((e) => { cdCooldown = Date.now() + 60000; cdByReq.clear(); cdByArt.clear(); note('Couldn’t make the spinning CD (' + e.message + '). Using the Gumi CD for now.'); return null; }));
   return cdByReq.get(rk);
 }
+function toCoverJpeg(img) { // square-crop + shrink to a still cover for Discord
+  const { width, height } = img.getSize(), s = Math.min(width, height);
+  return img.crop({ x: (width - s) >> 1, y: (height - s) >> 1, width: s, height: s }).resize({ width: 512, height: 512, quality: 'best' }).toJPEG(85);
+}
+async function uploadCover(buf, name) { // a still cover image to catbox, with the same size check as the GIF upload
+  const fd = new FormData(); fd.append('reqtype', 'fileupload'); fd.append('fileToUpload', new Blob([buf], { type: 'image/jpeg' }), name + '.jpg');
+  const r = await fetch('https://catbox.moe/user/api.php', { method: 'POST', body: fd }), t = (await r.text()).trim();
+  if (!r.ok || !/^https:\/\//.test(t)) throw new Error(t.slice(0, 80) || 'upload failed');
+  try { const h = await fetch(t, { method: 'HEAD' }); const len = +(h.headers.get('content-length') || 0); if (len && len !== buf.length) throw new Error('upload came back short (' + len + ' of ' + buf.length + ' bytes)'); } catch (e) { if (/came back short/.test(e.message)) throw e; }
+  return t;
+}
+function coverUrl(m) { // the regular album cover as a still image, for when CD Rich Presence is off
+  if (Date.now() < cdCooldown) return Promise.resolve(null);
+  const rk = cdKey(m);
+  if (!coverByReq.has(rk)) coverByReq.set(rk, (async () => {
+    const art = await getArt(m); if (!art) return null;
+    const cacheKey = art.key + '|cover';
+    if (cdLoad()[cacheKey]) return cdLoad()[cacheKey];
+    if (!coverByArt.has(cacheKey)) coverByArt.set(cacheKey, (async () => {
+      const url = await uploadCover(toCoverJpeg(art.img), art.key.slice(0, 12) + '-cover');
+      const cache = cdLoad(); cache[cacheKey] = url; fs.writeFileSync(cdCacheFile(), JSON.stringify(cache)); return url;
+    })());
+    return coverByArt.get(cacheKey);
+  })().then((u) => { if (u) coverDone.set(rk, u); return u; })
+    .catch((e) => { cdCooldown = Date.now() + 60000; coverByReq.clear(); coverByArt.clear(); return null; }));
+  return coverByReq.get(rk);
+}
 
 // "Listening to..." while no game is running
 // Layout, top to bottom on Discord:
@@ -193,42 +226,57 @@ async function applyMusic() {
   manualHold = false;
   try {
     const m = musicState, user = await connect(clientId());
-    let first = (m.cdSpin && cdDone.get(cdKey(m))) || m.image, cdPromise = null;
-    // If the album CD isn't ready yet, wait for it (up to 8 seconds) instead
-    // of sending the fallback 'cd' first. If that asset was never uploaded
-    // in the Developer Portal, Discord shows a "?" for those first seconds,
-    // and the album CD arriving later looks like the song "doesn't showcase
-    // anything" at all. Waiting means the first thing Discord sees is the
-    // album CD. If it takes longer than 8 s, or there's no cover, fall back
-    // to 'cd' as before — and the album CD still arrives later via cdPromise.
-    if (m.cdSpin && m.file && !cdDone.has(cdKey(m))) {
-      cdPromise = cdUrl(m).catch(() => null);
-      const url = await Promise.race([cdPromise, new Promise((r) => setTimeout(() => r(null), 8000))]);
-      if (url && !gameHold && musicState && musicState.file === m.file) first = url;
+    // CD Rich Presence on: the spinning CD from the album cover.
+    // Off: the regular album cover as a still image (uploaded once, cached).
+    // Either way, if the picture isn't ready yet, wait for it (up to 8
+    // seconds) instead of sending the fallback 'cd' first — if that asset
+    // was never uploaded in the Developer Portal, Discord shows a "?" for
+    // those first seconds, and the picture arriving later looks like the
+    // song "doesn't showcase anything" at all. Waiting means the first
+    // thing Discord sees is the right picture. If it takes longer than
+    // 8 s, or there's no cover, fall back to 'cd' as before — and the
+    // picture still arrives later via the promise below.
+    let first = m.image, cdPromise = null, coverPromise = null;
+    if (m.cdSpin) {
+      first = cdDone.get(cdKey(m)) || m.image;
+      if (m.file && !cdDone.has(cdKey(m))) {
+        cdPromise = cdUrl(m).catch(() => null);
+        const url = await Promise.race([cdPromise, new Promise((r) => setTimeout(() => r(null), 8000))]);
+        if (url && !gameHold && musicState && musicState.file === m.file) first = url;
+      }
+    } else if (m.file) {
+      first = coverDone.get(cdKey(m)) || m.image;
+      if (!coverDone.has(cdKey(m))) {
+        coverPromise = coverUrl(m).catch(() => null);
+        const url = await Promise.race([coverPromise, new Promise((r) => setTimeout(() => r(null), 8000))]);
+        if (url && !gameHold && musicState && musicState.file === m.file) first = url;
+      }
     }
     if (gameHold || !musicState || musicState.file !== m.file) return;
     const act = musicActivity(m, first); await user.setActivity(act); log('music status sent, name: ' + (act.name || 'Gumi RPC (app default)') + ', details: ' + act.details + ', state: ' + (act.state || '-') + ', picture: ' + (first || 'none') + ' (' + imageKind(normalizeDiscordImage(first)) + ')' + (imageKind(normalizeDiscordImage(first)) === 'asset' ? ' - must be uploaded as an Art Asset with exactly that name; Discord shows assets as still pictures' : '')); // the album CD if it was ready, else the Gumi CD until it is
-    // Discord's image proxy sometimes fails to fetch the CD link on the
-    // first try — even after waiting for it — and then keeps showing "?"
-    // until the activity is sent again. Switching songs manually worked
-    // around that, because each switch re-sent the activity and Discord
-    // retried the fetch. Do the same thing automatically: re-send this
-    // exact activity once, 5 seconds later, if the same song is still
-    // playing. That gives Discord a second fetch attempt without the
-    // user having to switch songs. Only for album CD links, not the
+    // Discord's image proxy sometimes fails to fetch the picture link on
+    // the first try — even after waiting for it — and then keeps showing
+    // "?" until the activity is sent again. Switching songs manually
+    // worked around that, because each switch re-sent the activity and
+    // Discord retried the fetch. Do the same thing automatically: re-send
+    // this exact activity once, 5 seconds later, if the same song is still
+    // playing. That gives Discord a second fetch attempt without the user
+    // having to switch songs. Only for hosted picture links, not the
     // fallback asset (which Discord already has or hasn't, no retry helps).
     if (typeof first === 'string' && /^https:\/\//.test(first)) {
       musicRefreshTimer = setTimeout(async () => {
         if (gameHold || !musicState || musicState.file !== m.file) return;
-        try { await (await connect(clientId())).setActivity(musicActivity(musicState, first)); log('music status re-sent so Discord retries the CD picture'); }
+        try { await (await connect(clientId())).setActivity(musicActivity(musicState, first)); log('music status re-sent so Discord retries the picture'); }
         catch {}
       }, 5000);
     }
-    if (cdPromise) cdPromise.then(async (url) => {
+    const sendLater = (promise, label) => { if (!promise) return; promise.then(async (url) => {
       if (!url || url === first || gameHold || !musicState || musicState.file !== m.file) return;
-      try { await (await connect(clientId())).setActivity(musicActivity(musicState, url)); log('album CD sent: ' + url); }
-      catch (e) { warn('Discord wouldn’t take the album CD picture: ' + e.message); }
-    });
+      try { await (await connect(clientId())).setActivity(musicActivity(musicState, url)); log(label + ' sent: ' + url); }
+      catch (e) { warn('Discord wouldn’t take the ' + label + ' picture: ' + e.message); }
+    }); };
+    sendLater(cdPromise, 'album CD');
+    sendLater(coverPromise, 'album cover');
   } catch (e) { rpc = null; rpcId = null; warn('Discord music status failed: ' + e.message); }
 }
 ipcMain.handle('config:get', () => ({ clientId: loadCfg().clientId || '' }));
@@ -245,6 +293,64 @@ ipcMain.handle('music:diag', () => {
   const img = (musicState.cdSpin && cdDone.get(cdKey(musicState))) || musicState.image;
   return { image: normalizeDiscordImage(img) || null, kind: imageKind(normalizeDiscordImage(img)), cdSpin: !!musicState.cdSpin, cdReady: !!cdDone.get(cdKey(musicState)) };
 });
+
+// ---- Gumi Remote: a tiny HTTP API so the Gumi Discord bot (running on
+// this same PC) can ask what is playing and control the player. Phase 1
+// is local only: the server binds to 127.0.0.1, so nothing here can be
+// reached from another computer, and requests from any other address
+// are refused anyway. The player itself lives in the renderer
+// (index.html), so the main process asks it over IPC and waits for the
+// answer — see askRenderer() and the 'gumi:remote' handler in the page.
+const REMOTE_PORT = 3742;
+const remotePending = new Map(); // request id -> function that finishes it
+let remoteSeq = 0;
+function askRenderer(action) {
+  // Ask the window to do something (or report its state) and wait for the
+  // reply. If the window is gone, or doesn't answer within 3 seconds,
+  // give up instead of hanging the bot's request forever.
+  return new Promise((resolve) => {
+    if (!win) return resolve({ ok: false, error: 'The app window is not open.' });
+    const id = 'r' + (++remoteSeq);
+    const timer = setTimeout(() => { remotePending.delete(id); resolve({ ok: false, error: 'The player did not answer in time.' }); }, 3000);
+    remotePending.set(id, (result) => { clearTimeout(timer); resolve({ ok: true, ...result }); });
+    win.webContents.send('gumi:remote', { id, action });
+  });
+}
+ipcMain.handle('gumi:remote-reply', (_e, msg) => { // the renderer answering askRenderer()
+  const done = msg && remotePending.get(msg.id);
+  if (done) { remotePending.delete(msg.id); done(msg.result || {}); }
+  return true;
+});
+function remoteApiHandler(req, res) {
+  const send = (code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(obj)); };
+  if (req.socket.remoteAddress !== '127.0.0.1' && req.socket.remoteAddress !== '::ffff:127.0.0.1') return send(403, { ok: false, error: 'Local connections only.' });
+  const u = new URL(req.url, 'http://127.0.0.1');
+  const route = async () => {
+    if (req.method === 'GET' && u.pathname === '/status') {
+      const s = await askRenderer('state');
+      if (!s.ok) return send(503, s);
+      return send(200, { ok: true, app: 'gumi-rpc', version: app.getVersion(), ...s });
+    }
+    if (req.method === 'GET' && u.pathname === '/nowplaying') {
+      const s = await askRenderer('state');
+      if (!s.ok) return send(503, s);
+      return send(200, { ok: true, ...s });
+    }
+    const action = req.method === 'POST' && { '/pause': 'pause', '/play': 'play', '/next': 'next', '/previous': 'previous' }[u.pathname];
+    if (action) {
+      const s = await askRenderer(action);
+      if (!s.ok) return send(503, s);
+      return send(200, { ok: true, ...s });
+    }
+    return send(404, { ok: false, error: 'Unknown route: ' + req.method + ' ' + u.pathname });
+  };
+  route().catch((e) => send(500, { ok: false, error: e.message || String(e) }));
+}
+function startRemoteApi() {
+  const srv = http.createServer(remoteApiHandler);
+  srv.on('error', (e) => log('Gumi Remote API could not start (port ' + REMOTE_PORT + '): ' + e.message));
+  srv.listen(REMOTE_PORT, '127.0.0.1', () => log('Gumi Remote API listening on 127.0.0.1:' + REMOTE_PORT));
+}
 
 // Find .exe files, skipping installers/crash handlers; biggest first (usually the game).
 const JUNK = /(unins|uninstall|crash|redist|vcredist|dxsetup|dotnet|helper|updater|setup|ue4prereq)/i;
@@ -309,6 +415,47 @@ ipcMain.handle('dialog:sound', async () => {
   const dest = path.join(dir, Date.now() + '-' + path.basename(r.filePaths[0]));
   fs.copyFileSync(r.filePaths[0], dest); // keep our own copy so moving the original can't break it
   return dest;
+});
+// Theme packages: pick a .zip/.gumipack, read its manifest.json, and
+// unpack the files it names into the app data folder (themes/<id>/), so
+// moving or deleting the package file can't break the theme. Only the
+// files the manifest names are written, and only inside the package.
+ipcMain.handle('theme:import', async () => {
+  const r = await dialog.showOpenDialog(win, { properties: ['openFile'], filters: [{ name: 'Theme packages', extensions: ['zip', 'gumipack'] }] });
+  if (r.canceled) return null;
+  try {
+    const files = readZip(fs.readFileSync(r.filePaths[0]));
+    const manifestRaw = files.get('manifest.json');
+    if (!manifestRaw) return { ok: false, error: 'No manifest.json in that package.' };
+    const m = JSON.parse(manifestRaw.toString('utf8'));
+    if (m.format !== 'gumi-theme' || m.version !== 1) return { ok: false, error: 'That is not a Gumi theme package.' };
+    if (!m.id || !m.name || !m.image) return { ok: false, error: 'The package manifest is missing an id, a name, or a wallpaper.' };
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(m.id)) return { ok: false, error: 'The package id must be lowercase letters, numbers and dashes.' };
+    const pick = (rel) => {
+      if (!rel) return null;
+      const clean = String(rel).replace(/\\/g, '/');
+      if (clean.startsWith('/') || clean.includes('..')) return null;
+      return files.get(clean) || null;
+    };
+    if (!pick(m.image)) return { ok: false, error: 'The package is missing its wallpaper file.' };
+    const dir = path.join(app.getPath('userData'), 'themes', m.id);
+    fs.mkdirSync(dir, { recursive: true });
+    const out = {};
+    const save = (rel) => {
+      const data = pick(rel); if (!data) return null;
+      const clean = String(rel).replace(/\\/g, '/');
+      const dest = path.join(dir, clean);
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.writeFileSync(dest, data);
+      return dest;
+    };
+    out.image = save(m.image);
+    for (const k of ['sidebarPic', 'click', 'themeMusic', 'font', 'css', 'wallpaperIntro']) { const d = save(m[k]); if (d) out[k] = d; }
+    if (Array.isArray(m.themeMusicList)) { const ds = m.themeMusicList.map((rel) => save(rel)).filter(Boolean); if (ds.length) out.themeMusicList = ds; }
+    if (m.icons) { out.icons = {}; for (const [k, rel] of Object.entries(m.icons)) { const d = save(rel); if (d) out.icons[k] = d; } if (!Object.keys(out.icons).length) delete out.icons; }
+    if (m.mascot) { const d = save(m.mascot); if (d) out.mascot = d; }
+    return { ok: true, manifest: m, files: out };
+  } catch (e) { return { ok: false, error: 'Could not read that package: ' + e.message }; }
 });
 
 ipcMain.handle('presence:set', async (_e, id) => { const g = load().find((x) => x.id === id); if (!g) return { ok: false, error: 'Game not found.' }; const r = await setPresence(g); manualHold = r.ok; return r; });
@@ -460,6 +607,10 @@ ipcMain.handle('music:cover', async (_e, file) => {
     return `data:${p.format};base64,${Buffer.from(p.data).toString('base64')}`;
   } catch { return null; }
 });
+// Lyrics (LRCLIB, free, no key): search by artist + title in the main
+// process so the page never has to deal with CORS. Fetches in the
+// background, never blocks playback; the renderer caches the result.
+ipcMain.handle('lyrics:get', async (_e, q) => fetchLyrics(q || {}, { userAgent: 'Gumi RPC/' + app.getVersion() }));
 
 // ---- Self-updates from GitHub Releases (Nobuqq/Gumi-RPC) ----
 // Only the installed app updates itself: in the test version (npm start)
@@ -486,7 +637,24 @@ ipcMain.handle('update:check', () => new Promise((resolve) => {
 }));
 ipcMain.handle('update:restart', () => { if (autoUpdater) autoUpdater.quitAndInstall(); return true; });
 ipcMain.handle('app:version', () => app.getVersion());
+// Patch notes: Brandon writes them in patch-notes.json (next to
+// package.json), and the little notepad at the top right of the app
+// shows them so anyone can re-read any version at any time. The
+// release script writes new entries into this file when it ships.
+ipcMain.handle('app:patchNotes', () => {
+  try {
+    const p = path.join(__dirname, 'patch-notes.json');
+    const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
+});
+// Developer / Showcasing mode is dev-copy only: it only exists when a
+// marker file called `dev-mode` (no extension, contents don't matter)
+// sits in %APPDATA%\gumi-rpc. A public install never has that file, so
+// the mode never appears there. Brandon creates the file once on his
+// dev copy to unlock the toggle in Settings.
+ipcMain.handle('dev:isDev', () => { try { return fs.existsSync(path.join(app.getPath('userData'), 'dev-mode')); } catch { return false; } });
 
-app.whenReady().then(() => { app.setAppUserModelId('com.gumi.rpc'); createWindow(); setupUpdates(); });
+app.whenReady().then(() => { app.setAppUserModelId('com.gumi.rpc'); createWindow(); setupUpdates(); startRemoteApi(); });
 app.on('before-quit', () => { clearPresence(); });
 app.on('window-all-closed', () => app.quit());

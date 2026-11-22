@@ -28,12 +28,20 @@ button:disabled { opacity:.4; cursor:not-allowed; }
 
 #bar { display:flex; align-items:center; gap:10px; padding-left:12px; background:var(--bg2); border-bottom:2px solid var(--line); -webkit-app-region:drag; font-size:19px; }
 #bar .logo { width:26px; height:26px; } #bar .logo > * { width:100%; height:100%; } #bar span { flex:1; }
+/* Developer / Showcasing mode badge: a small DEMO tag in the title bar
+   while the sample library is showing, so it's always obvious the
+   content is not the real library. */
+#bar #demoBadge { flex:none; font-size:12px; font-weight:800; letter-spacing:1px; color:#111; background:#ffd23f; border-radius:6px; padding:2px 8px; margin-right:10px; }
 .wc { width:52px; height:100%; border:0; border-left:2px solid var(--line); border-radius:0; padding:0; -webkit-app-region:no-drag; }
 .wc.x { --fill:#ff3d6e; } .wc:hover:not(:disabled) { box-shadow:none; } .wc:active:not(:disabled) { transform:none; }
 
 #mid { display:grid; grid-template-columns:auto 1fr; min-height:0; }
 #rail { width:84px; background:var(--bg2); border-right:2px solid var(--line); display:flex; flex-direction:column; justify-content:space-between; gap:12px; padding:14px; position:relative; z-index:3; transition:width .3s ease; }
 #rail.open { width:250px; }
+/* the title-screen selection bar (Persona 3): one blue bar that glides
+   behind the active nav item. Hidden unless the active theme's CSS shows
+   it — the app just keeps it parked on the active button. */
+#selbar { display:none; position:absolute; left:0; right:0; top:0; height:0; z-index:0; }
 #rail .top, #rail .bot { display:flex; flex-direction:column; gap:10px; }
 #tabs { width:56px; height:56px; flex:none; padding:0; border-radius:14px; display:grid; place-content:center; gap:6px; }
 #tabs i { display:block; width:28px; height:4px; border-radius:2px; background:var(--text); }
@@ -54,6 +62,11 @@ button:disabled { opacity:.4; cursor:not-allowed; }
   -webkit-mask-size:contain; mask-size:contain;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
   -webkit-mask-position:center; mask-position:center; }
+/* Picture icons from a theme package (e.g. Frutiger Aero): the picture
+   shows as a real image instead of a recoloured silhouette */
+.ni.pic { height:24px; background-color:transparent;
+  -webkit-mask-image:none; mask-image:none;
+  background-image:var(--pic); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* Neon mode: glow on titles and headings, stronger button glow */
 body.neon #title, body.neon #settingsView h2, body.neon #npTitle, body.neon .shead { text-shadow:0 0 8px var(--purple),0 0 18px var(--purple),0 0 32px var(--cyan); }
 body.neon button:hover:not(:disabled) { box-shadow:0 0 22px var(--purple),0 0 34px rgba(var(--pr),.6); }
@@ -61,6 +74,14 @@ body.neon .nav.act, body.neon .item.sel { box-shadow:0 0 16px rgba(var(--pr),.7)
 /* Customize section */
 #customizeBox { display:grid; gap:12px; background:var(--panel); border:2px solid var(--line); border-radius:12px; padding:14px 18px; }
 #myThemes { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+/* Theme selection menu: the grid is grouped (Built-in, then My themes)
+   with a label on every card, so it stays findable when there are lots
+   of themes — plus a search box that filters by name. */
+.themeGroup { grid-column:1 / -1; font-size:15px; font-weight:800; margin:6px 0 0; }
+.themeGroup .cnt { color:var(--muted); font-weight:600; }
+.theme-card .tlabel { position:absolute; top:8px; left:8px; font-size:11px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:#fff; background:rgba(0,0,0,.55); border-radius:6px; padding:2px 7px; }
+.theme-card { position:relative; }
+#themeSearch { padding:8px 10px; font-size:14px; }
 .theme-card { display:grid; gap:6px; padding:8px; border:2px solid var(--line); border-radius:12px; background:var(--bg2); cursor:pointer; text-align:left; }
 .theme-card.act { --base:var(--grad); border-color:var(--hi); box-shadow:0 0 14px rgba(var(--pr),.45); }
 .theme-card .tprev { width:100%; aspect-ratio:16/9; border-radius:8px; background:var(--panel) center/cover no-repeat; border:1px solid var(--line); }
@@ -80,9 +101,9 @@ body.neon .nav.act, body.neon .item.sel { box-shadow:0 0 16px rgba(var(--pr),.7)
 #me { padding:0 8px; }
 .av { width:36px; height:36px; flex:none; border-radius:10px; overflow:hidden; display:grid; place-items:center; background:var(--btn); }
 .av > * { width:100%; height:100%; object-fit:cover; }
-#acct { position:absolute; left:calc(100% + 10px); bottom:14px; display:none; flex-direction:column; gap:8px; width:240px; padding:14px; background:var(--panel); border:2px solid var(--line); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.5); z-index:5; }
+#acct { position:absolute; left:calc(100% + 10px); bottom:80px; display:none; flex-direction:row; align-items:center; gap:12px; width:400px; padding:10px 14px; background:var(--panel); border:2px solid var(--line); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.5); z-index:5; }
 #acct.open { display:flex; }
-#acct p { margin:0; color:var(--muted); font-size:14px; } #acct .who { font-size:19px; word-break:break-word; }
+#acct p { margin:0; color:var(--muted); font-size:14px; white-space:nowrap; } #acct .who { font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; } #acct button { margin-left:auto; flex-shrink:0; white-space:nowrap; }
 #acct .dc { --base:#5865f2; --fill:#7b86ff; border-color:#5865f2; }
 
 #content { display:grid; grid-template-columns:minmax(240px,320px) 1fr; grid-template-rows:1fr auto; min-height:0; }
@@ -103,15 +124,24 @@ body.neon .nav.act, body.neon .item.sel { box-shadow:0 0 16px rgba(var(--pr),.7)
 .empty { width:70%; } .empty > *:first-child { width:90px; height:90px; margin:0 auto; display:block; } .empty p { margin:8px 0 0; }
 #title { font-size:30px; text-shadow:0 0 18px rgba(var(--pr),.8); max-width:90%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #sub { color:var(--muted); min-height:1.3em; }
-#play { --base:var(--grad); --fill:var(--cyan); width:min(360px,80%); font-size:30px; padding:8px; border-radius:10px; border-color:var(--cyan); box-shadow:0 0 18px rgba(59,232,255,.4); }
+#play { --base:var(--grad); --fill:var(--cyan); width:min(360px,80%); font-size:30px; padding:8px; border-radius:10px; border-color:var(--cyan); box-shadow:0 0 18px color-mix(in srgb,var(--cyan) 40%,transparent); }
 #play:hover:not(:disabled), #add:hover, #ask:hover { color:#04121a; }
 #musicView { grid-column:1/-1; grid-row:1; display:grid; grid-template-columns:1fr auto; min-height:0; }
 #mini { position:fixed; z-index:20; left:50%; bottom:84px; transform:translateX(-50%); width:min(680px,92%); display:flex; align-items:center; gap:10px; background:var(--panel); border:2px solid color-mix(in srgb,var(--purple) 40%,var(--line)); border-radius:12px; padding:8px 10px; cursor:grab;
   transition:left .45s cubic-bezier(.3,1,.4,1), bottom .45s cubic-bezier(.3,1,.4,1), width .45s cubic-bezier(.3,1,.4,1), border-radius .45s, transform .45s cubic-bezier(.3,1,.4,1), background .3s, border-color .3s; }
 /* Music view: the player grows into a full-width bar along the bottom, just above the footer. Other views: it shrinks back to the floating pill. */
 #mini.big { left:0; bottom:70px; transform:none; width:100%; border-radius:0; border-left:0; border-right:0; cursor:default; }
+/* the pill sits above the footer (#foot is 21) so a dragged-low pill is never
+   hidden behind it; the bar keeps the base z-index 20 so the Add Music menu
+   inside #foot still paints above it in Music view */
+#mini:not(.big) { z-index:22; }
 #mini.free { transform:none; }
 #mini.dragging { transition:none; cursor:grabbing; }
+/* while the rail-tracking loop runs, the bar must follow layoutBigBar()
+   instantly — the .45s morph transition above would make it glide toward
+   each frame's target instead and trail ~70px behind the widening rail.
+   Same pattern as .dragging; only suppressed during rail tracking. */
+#mini.tracking { transition:none; }
 body.mini-big #musicView { padding-bottom:64px; }
 #mini .disc { width:44px; height:44px; flex:none; border:2px solid var(--purple); border-radius:50%; background:var(--bg2); display:grid; place-items:center; color:var(--cyan); }
 #mini .meta { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:2px; overflow:hidden; } #song { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
@@ -123,13 +153,59 @@ body.mini-big #musicView { padding-bottom:64px; }
 .skip svg, .pp svg { width:24px; height:24px; fill:currentColor; }
 .pp { width:48px; height:48px; border-radius:50%; --base:var(--text); --fill:var(--cyan); color:var(--bg); border-color:var(--text); }
 .pp:hover:not(:disabled) { color:#04121a; }
-#foot { background:var(--bg2); border-top:2px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:0 18px; }
+#foot { position:relative; z-index:21; /* must clear #rail (3) so the Add Music menu isn't hidden behind the sidebar, and #mini (20) so the menu's lower half isn't covered by the big player bar in Music view */ background:var(--bg2); border-top:2px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:0 18px; }
 #add { --base:var(--grad); --fill:var(--cyan); font-size:22px; padding:8px 18px; border-color:var(--hi); }
 #ask { --fill:var(--cyan); display:flex; align-items:center; gap:8px; padding:4px 14px 4px 6px; }
 #ask .logo { width:34px; height:34px; } #ask .logo > * { width:100%; height:100%; }
+/* Theme music toggle in the footer, next to Ask Gumi. Only shown while the
+   active theme has theme music — on it glows, off it goes dim with a slash
+   on the note. It wears the active theme's styling: cyan HUD rim under
+   Sonic, glossy aqua under Aero. */
+#themeMusicToggle { display:flex; align-items:center; justify-content:center; gap:6px; height:44px; min-width:44px; padding:0 12px; margin-left:auto; margin-right:10px; border-radius:10px; cursor:pointer; font-family:inherit; background:var(--panel); border:2px solid var(--line); color:var(--text); transition:box-shadow .25s ease, border-color .25s ease, color .25s ease, opacity .25s ease; }
+#themeMusicToggle.on { border-color:var(--hi); color:var(--hi); box-shadow:0 0 12px color-mix(in srgb, var(--hi) 55%, transparent); }
+#themeMusicToggle.is-off { opacity:.45; }
+#themeMusicToggle .tmlabel { font-size:13px; font-weight:700; }
+/* the theme song now playing — sits next to the theme music toggle, shows
+   which track of the theme's list is playing, and hides whenever the
+   theme music stops (a user song starts, the toggle goes off, the theme
+   changes to one with no music). */
+#themeMusicNow { display:none; align-items:center; gap:6px; font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px; margin-right:10px; }
+body.hud #themeMusicToggle { background:var(--panel); border-color:var(--cyan); color:var(--cyan); }
+body.hud #themeMusicToggle.on { color:#fff; border-color:#84ffff; box-shadow:0 0 0 2px rgba(132,255,255,.9), 0 0 16px rgba(132,255,255,.65); }
+body.bubble #themeMusicToggle { background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(160,230,255,.75) 45%, rgba(70,180,230,.85)); border-color:rgba(255,255,255,.9); color:#0b3d5c; box-shadow:inset 0 2px 6px rgba(255,255,255,.9), 0 2px 10px rgba(0,0,0,.25); }
+body.bubble #themeMusicToggle.on { box-shadow:inset 0 2px 6px rgba(255,255,255,.9), 0 0 0 2px rgba(255,255,255,.8), 0 0 18px rgba(120,220,255,.9); }
+/* Theme cursor: a little glowing ball that sits beside whatever is
+   selected and glides to the next one (the Kingdom Hearts menu cursor).
+   Only shown while the active theme carries a cursor colour — the colour
+   comes from the theme via --cursor. */
+#themeCursor { position:fixed; z-index:60; width:18px; height:18px; border-radius:50%; left:0; top:0; display:none; background:radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--cursor) 40%, white), var(--cursor) 55%, color-mix(in srgb, var(--cursor) 65%, black)); box-shadow:0 0 10px var(--cursor), 0 0 22px color-mix(in srgb, var(--cursor) 60%, transparent); transition:top .38s cubic-bezier(.34,1.3,.5,1), left .38s cubic-bezier(.34,1.3,.5,1), opacity .2s; pointer-events:none; }
+/* Menu theme: dark translucent pills like the Kingdom Hearts menu. */
+body.menu .item, body.menu .song, body.menu .plc, body.menu .theme-card, body.menu #mini, body.menu #np { border-radius:14px; background:color-mix(in srgb, var(--panel) 88%, transparent); border:1px solid color-mix(in srgb, var(--cyan) 30%, transparent); }
+body.menu .nav.act { background:color-mix(in srgb, var(--cyan) 22%, transparent); border-color:color-mix(in srgb, var(--cyan) 45%, transparent); }
 
 #modal, #pmodal { position:fixed; inset:0; background:rgba(5,6,20,.82); display:none; place-items:center; padding:20px; z-index:40; }
 #modal.open, #pmodal.open { display:grid; }
+/* Patch notes: the little notepad at the top right of the title bar
+   opens this panel, so anyone can re-read any version's notes at any
+   time. The notes themselves live in patch-notes.json, which Brandon
+   (and the release script) edits. */
+#patchNotesBtn { flex:none; width:40px; height:100%; border:0; border-left:2px solid var(--line); border-radius:0; padding:0; display:grid; place-items:center; color:var(--text); -webkit-app-region:no-drag; }
+#patchNotesBtn svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+#patchNotesModal { position:fixed; inset:0; background:rgba(5,6,20,.82); display:none; place-items:center; padding:20px; z-index:40; }
+#patchNotesModal.open { display:grid; }
+#patchNotesBox { width:min(560px, 92vw); max-height:80vh; overflow:auto; background:var(--panel); border:2px solid var(--line); border-radius:14px; padding:18px 20px; }
+#patchNotesBox .pnHead { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+#patchNotesBox .pnHead h2 { margin:0; }
+#patchNotesClose { width:32px; height:32px; padding:0; border-radius:50%; flex:none; }
+#patchNotesList .pnVer { font-size:16px; font-weight:800; margin:14px 0 4px; }
+#patchNotesList .pnVer:first-child { margin-top:0; }
+#patchNotesList .pnDate { font-size:12px; color:var(--muted); margin-bottom:4px; }
+/* Gumi-Auto writes a heading + subheading for each release — the
+   heading reads as the release title, the subheading as its summary. */
+#patchNotesList .pnHead { font-size:15px; font-weight:700; margin:6px 0 2px; }
+#patchNotesList .pnSub { font-size:14px; color:var(--muted); margin-bottom:4px; }
+#patchNotesList ul { margin:0 0 4px; padding-left:20px; }
+#patchNotesList li { margin-bottom:3px; }
 form { width:min(580px,100%); max-height:92vh; overflow:auto; background:var(--panel); border:2px solid var(--line); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,.6); padding:20px; display:grid; gap:10px; }
 label { display:grid; gap:4px; font-size:14px; color:var(--muted); }
 input[type=text] { padding:9px 11px; border:2px solid var(--line); border-radius:8px; background:var(--bg2); color:var(--text); font:inherit; }
@@ -179,15 +255,49 @@ body.noscan::after { display:none; }
 #addMusic:hover, #mkpl:hover { color:#04121a; }
 input[type=range] { accent-color:var(--purple); cursor:pointer; }
 .vol { width:70px; flex:none; }
-.cd { position:relative; flex:none; border-radius:50%; background:var(--cdbg,conic-gradient(from 20deg,#ff4fa3,#8b4dff,#3be8ff,#ff4fa3)) center/cover; border:2px solid var(--line); box-shadow:0 0 30px rgba(var(--pr),.45); animation:spin 5s linear infinite; animation-play-state:paused; }
+.cd { position:relative; flex:none; border-radius:50%; background:var(--cdbg,conic-gradient(from 20deg,var(--pink),var(--purple),var(--cyan),var(--pink))) center/cover; border:2px solid var(--line); box-shadow:0 0 30px rgba(var(--pr),.45); animation:spin 5s linear infinite; animation-play-state:paused; }
 .cd::before { content:''; position:absolute; inset:0; border-radius:50%; background:conic-gradient(rgba(255,255,255,.22),transparent 25%,rgba(255,255,255,.18) 50%,transparent 75%,rgba(255,255,255,.22)); }
 .cd::after { content:''; position:absolute; left:50%; top:50%; width:22%; height:22%; transform:translate(-50%,-50%); border-radius:50%; background:var(--bg); border:3px solid rgba(255,255,255,.55); }
 .cd.big { width:220px; height:220px; } .cd.sm { width:44px; height:44px; box-shadow:none; } .cd.sm::after { border-width:2px; }
 body.playing .cd { animation-play-state:running; }
 @keyframes spin { to { transform:rotate(360deg); } }
+/* the CD toggles (Settings > CD): when the in-app CD is off, the disc
+   becomes the full album cover instead — square, still, no hole and no
+   sheen. The cover is already the disc's background (--cdbg), so it just
+   stops being a disc. The 22% hole (::after) and the sheen (::before)
+   are hidden, never restyled. */
+body.cd-cover .cd { border-radius:10px; animation:none; }
+body.cd-cover .cd::before, body.cd-cover .cd::after { display:none; }
+/* CD hole: the small hole in the middle of the spinning CD. Hiding it
+   keeps the disc round and spinning, but the album cover stays whole —
+   the hole no longer cuts into the artwork. */
+body.cd-nohole .cd::after { display:none; }
 .tl { display:flex; align-items:center; gap:8px; width:100%; min-width:0; font-size:12px; color:var(--muted); } .tl .js-cur, .tl .js-dur { flex:none; } .tl input { flex:1; min-width:0; }
-#lib { display:flex; flex-direction:column; min-height:0; } #lib .scroll { flex:1; overflow:auto; padding:18px; }
+#lib { display:flex; flex-direction:column; min-height:0; min-width:0; } #lib .scroll { flex:1; overflow:auto; padding:18px; }
 #albums, #pls { display:flex; gap:14px; overflow-x:auto; padding:6px 4px 14px; }
+/* Album / playlist detail: the cover glides from its grid spot to this
+   full-screen view (FLIP), showing only that album's or playlist's
+   songs. The back arrow on the side glides the cover home. */
+#albumDetail { position:fixed; inset:0; z-index:30; background:var(--bg); display:flex; flex-direction:column; gap:18px; padding:26px 28px; overflow:auto; }
+#albumDetail.off { display:none; }
+/* Album switcher: every other album/playlist stays in a strip at the top
+   of the detail, so you can jump to another one without backing out.
+   Switching is instant (no glide) — the glide is only for opening from
+   the grid. */
+#adSwitch { display:flex; gap:10px; overflow-x:auto; padding:4px 2px; flex:none; }
+.adSw { flex:none; width:64px; height:64px; border-radius:10px; background:var(--panel) center/cover no-repeat; border:2px solid var(--line); font-size:26px; display:grid; place-items:center; cursor:pointer; padding:0; }
+.adSw.on { border-color:var(--hi); box-shadow:0 0 10px rgba(var(--pr),.4); }
+#adBack { align-self:flex-start; width:44px; height:44px; border-radius:50%; font-size:22px; line-height:1; display:grid; place-items:center; color:var(--text); }
+#adHero { display:flex; gap:22px; align-items:flex-end; }
+#adCover { flex:none; width:220px; height:220px; border-radius:16px; background-size:cover; background-position:center; background-color:var(--panel); display:grid; place-items:center; font-size:64px; border:2px solid var(--line); }
+#adMeta h2 { margin:0 0 6px; font-size:32px; }
+#adSongs { display:flex; flex-direction:column; gap:6px; }
+#adSongs .song { display:flex; }
+#adSongs .song .sb { flex:1; }
+/* Queue button on each song in the detail — tap it to place the song in
+   Up next without leaving the album. */
+#adSongs .sq { flex:none; width:32px; height:32px; padding:0; border-radius:50%; align-self:center; margin-left:8px; font-size:16px; }
+#adFly { position:fixed; z-index:31; pointer-events:none; background-size:cover; background-position:center; background-color:var(--panel); display:grid; place-items:center; font-size:32px; border-radius:14px; border:2px solid var(--line); transition:top .45s cubic-bezier(.22,.9,.3,1), left .45s cubic-bezier(.22,.9,.3,1), width .45s cubic-bezier(.22,.9,.3,1), height .45s cubic-bezier(.22,.9,.3,1), border-radius .45s cubic-bezier(.22,.9,.3,1), font-size .45s cubic-bezier(.22,.9,.3,1); }
 .plc { position:relative; flex:none; }
 .plb { width:108px; padding:8px; display:grid; gap:6px; justify-items:center; border-radius:14px; }
 .plc.on .plb { --base:var(--grad); border-color:var(--hi); }
@@ -199,7 +309,54 @@ body.playing .cd { animation-play-state:running; }
 .song.now .sb { --base:var(--grad); border-color:var(--hi); }
 .sn { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .sa { color:var(--muted); font-size:14px; }
 .song.now .sa, .sb:hover .sa { color:#fff; } .sx { width:42px; padding:0; } .muted { color:var(--muted); }
-#np { width:min(360px,34vw); border-left:2px solid var(--line); background:var(--panel); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:12px; padding:20px; min-height:0; overflow:auto; }
+#np { width:min(360px,34vw); position:relative; border-left:2px solid var(--line); background:var(--panel); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:12px; padding:20px; min-height:0; overflow:hidden; }
+/* lyrics: small mic button, top-left of the big player — it swaps the whole
+   panel to the lyrics view (and back). The mic is a currentColor silhouette
+   like the other icons, so it follows the theme's icon colour. */
+#npLyricsBtn { position:absolute; top:12px; left:12px; width:36px; height:36px; padding:0; border-radius:50%; display:grid; place-items:center; color:var(--text); z-index:2; }
+#npLyricsBtn svg { width:20px; height:20px; fill:currentColor; }
+#npLyricsBtn.on { --base:var(--grad); border-color:var(--hi); color:#fff; box-shadow:0 0 12px rgba(255,79,163,.55); }
+/* Equalizer: the same round button, right of the lyrics button, opening
+   a small panel with the five modes and the 8D toggle. The button glows
+   while a mode other than Flat is on, or while 8D is on. */
+#npEqBtn { position:absolute; top:12px; left:56px; width:36px; height:36px; padding:0; border-radius:50%; display:grid; place-items:center; color:var(--text); z-index:2; }
+#npEqBtn svg { width:20px; height:20px; fill:currentColor; }
+#npEqBtn.on { --base:var(--grad); border-color:var(--hi); color:#fff; box-shadow:0 0 12px rgba(255,79,163,.55); }
+/* Equalizer: its own full menu, like the lyrics view — it replaces the
+   player while it is open. Five sliders (one per band) you can move by
+   hand, or a preset if you don't feel like adjusting. Moving a slider
+   by hand switches to Custom and saves those gains. */
+#np.eq #npPlayer { display:none; }
+#npEqView { width:100%; flex:1; min-height:0; display:none; flex-direction:column; align-items:center; padding-top:44px; overflow:auto; }
+#np.eq #npEqView { display:flex; }
+#npEqView .npEqHead { font-size:18px; font-weight:800; margin-bottom:4px; }
+#npEqSliders { display:flex; gap:16px; align-items:flex-end; margin:14px 0 18px; }
+.eqBand { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.eqBand input[type=range] { writing-mode:vertical-lr; direction:rtl; width:24px; height:150px; padding:0; }
+.eqBand .eqVal { font-size:12px; color:var(--muted); min-width:34px; text-align:center; }
+.eqBand .eqFreq { font-size:12px; }
+#npEqView .eqModes { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:12px; max-width:340px; }
+#npEqView .eqModes button { padding:6px 10px; font-size:13px; }
+#npEqView .eqModes button.sel { --base:var(--grad); border-color:var(--hi); color:#fff; }
+#npEqView .srow { width:100%; max-width:340px; }
+/* lyrics: the big player switches to a lyrics view — tapping the mic swaps
+   the whole panel to lyrics (Apple Music style: current line bright and big,
+   neighbours dimmed, one line at a time), and the mic stays pinned top-left
+   so you can switch straight back. #np itself never scrolls; the player
+   and the lines each scroll inside their own area. */
+#npPlayer { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:12px; width:100%; flex:1; min-height:0; overflow:auto; }
+#np.lyrics #npPlayer { display:none; }
+#npLyrics { width:100%; flex:1; min-height:0; display:none; flex-direction:column; align-items:center; text-align:center; padding-top:44px; }
+#np.lyrics #npLyrics { display:flex; }
+.npLyricsHead { font-size:16px; margin-bottom:6px; }
+#npLyricsStatus { font-size:13px; margin-bottom:6px; }
+/* safe center: short lists stay centred, but a long list starts at the top
+   instead of overflowing into unreachable space above the container */
+#npLyricLines { flex:1; min-height:0; width:100%; overflow:auto; display:grid; gap:16px; align-content:safe center; padding:12px 4px; }
+#npLyricLines .lrow { color:var(--muted); font-size:19px; line-height:1.5; font-weight:600; cursor:pointer; border-radius:12px; padding:2px 10px; transition:color .35s ease, background-color .35s ease, text-shadow .35s ease; }
+#npLyricLines .lrow:hover { color:color-mix(in srgb, var(--muted) 40%, var(--text)); }
+#npLyricLines .lrow.on { color:var(--text); font-weight:800; font-size:23px; text-shadow:0 1px 4px rgba(0,0,0,.65), 0 0 16px rgba(0,0,0,.45); background:color-mix(in srgb, var(--purple) 28%, transparent); }
+#npLyricLines .lyricPlain { white-space:pre-line; color:var(--text); font-size:16px; line-height:1.6; margin:0; }
 #npUp { flex:1; min-height:0; width:100%; overflow:auto; border-top:2px solid var(--line); padding-top:10px; }
 .npUpHead { display:flex; justify-content:space-between; align-items:center; font-size:16px; margin-bottom:6px; }
 .npUpHead button { padding:2px 10px; font-size:13px; }
@@ -211,7 +368,7 @@ body.playing .cd { animation-play-state:running; }
 #mini .tl #wave { flex:1; min-width:0; width:auto; }
 .skip.on { color:var(--cyan); }
 .sec { margin:6px 4px 2px; font-size:16px; color:var(--muted); }
-#cards { flex:none; max-height:50%; overflow:auto; padding:8px 18px 0; }
+#cards { flex:none; min-width:0; max-height:50%; overflow:auto; padding:8px 18px 0; }
 .lh { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:6px 22px 10px; } .lh #listTitle { margin:0; } .lh .row { display:flex; gap:8px; } .lh button { padding:5px 14px; }
 #foot .btns { position:relative; }
 #addMenu { position:absolute; left:0; bottom:calc(100% + 18px); display:none; flex-direction:column; gap:8px; padding:10px; background:var(--panel); border:2px solid var(--line); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.5); z-index:8; white-space:nowrap; }
@@ -230,6 +387,106 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
 #customizeBox { border-color:color-mix(in srgb,var(--purple) 45%,var(--line)); }
 .song .sb, .plc .plb { --base:color-mix(in srgb,var(--purple) 10%,var(--btn)); border-color:color-mix(in srgb,var(--purple) 25%,var(--line)); }
 .item { --fill:color-mix(in srgb,var(--purple) 55%,var(--itemfill)); }
+/* Bubble/glass theme packages (e.g. Frutiger Aero): the main boxes turn
+   into real bubbles — very clear, with a bright top highlight, a bright
+   rim and a faint bottom glow, so the wallpaper shows through. The dim
+   layer under the wallpaper (#bgdim) keeps the text readable. */
+body.bubble .box, body.bubble #customizeBox, body.bubble .theme-card,
+body.bubble #list, body.bubble #np, body.bubble #mini, body.bubble #queuePanel,
+body.bubble #ctxMenu, body.bubble #acct, body.bubble .srow, body.bubble #choices,
+body.bubble #box, body.bubble form, body.bubble .hd, body.bubble #bar, body.bubble #foot,
+body.bubble #addMenu {
+  background-color:color-mix(in srgb,var(--panel) 30%,transparent);
+  background-image:radial-gradient(ellipse 90% 55% at 50% 0%,rgba(255,255,255,.38),rgba(255,255,255,.10) 45%,transparent 70%),linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,.03) 30%,transparent 60%);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  border-color:rgba(255,255,255,.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -8px 16px rgba(255,255,255,.10),0 8px 24px rgba(0,0,0,.35);
+  border-radius:20px;
+}
+/* the top/bottom chrome keeps square edges */
+body.bubble #bar, body.bubble #foot { border-radius:0; }
+/* the big music bar is a bubble capsule instead — fully rounded ends like
+   the mini-player pill. No overflow:hidden here: the Up next queue panel
+   is a child of #mini and pops up above the bar, and clipping would hide it. */
+body.bubble #mini.big { border-left:0; border-right:0; border-radius:999px; }
+/* bubble mode: the small muted descriptions wash out against the bright
+   wallpaper showing through the clear panels — pull them toward the text
+   colour and give them a soft dark shadow so they hold up. The bubble
+   look itself doesn't change. */
+body.bubble .muted, body.bubble .srow small, body.bubble .shead small {
+  color:color-mix(in srgb,var(--muted) 45%,var(--text));
+  text-shadow:0 1px 4px rgba(0,0,0,.6);
+}
+/* buttons keep their hover-fill, so only their base colour goes glass —
+   no background image here, or it would cover the hover-fill sweep */
+body.bubble .song .sb, body.bubble .plc .plb, body.bubble .item {
+  --base:color-mix(in srgb,var(--panel) 30%,transparent);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  border-color:rgba(255,255,255,.5);
+  border-radius:18px;
+}
+/* bubble mode: the mini player's transport buttons are glossy aqua capsules
+   built from the theme's --cyan, so they stay theme-matched. Scoped to #mini
+   only — the big player's controls are untouched. Sizes, round shapes and
+   the hover/active scale behaviour are unchanged. */
+body.bubble #mini .pp, body.bubble #mini .skip {
+  background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(255,255,255,.85),rgba(255,255,255,.25) 45%,transparent 70%),linear-gradient(180deg,color-mix(in srgb,var(--cyan) 45%,#ffffff),color-mix(in srgb,var(--cyan) 80%,#062a33));
+  border:2px solid rgba(255,255,255,.75);
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.9),inset 0 -4px 8px rgba(255,255,255,.25),0 2px 10px rgba(0,0,0,.35);
+  color:#fff;
+}
+/* bubble mode: the lyrics mic gets the same glossy aqua treatment as the
+   mini player's transport buttons, so it stays theme-matched. */
+body.bubble #npLyricsBtn {
+  background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(255,255,255,.85),rgba(255,255,255,.25) 45%,transparent 70%),linear-gradient(180deg,color-mix(in srgb,var(--cyan) 45%,#ffffff),color-mix(in srgb,var(--cyan) 80%,#062a33));
+  border:2px solid rgba(255,255,255,.75);
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.9),inset 0 -4px 8px rgba(255,255,255,.25),0 2px 10px rgba(0,0,0,.35);
+  color:#fff;
+}
+body.bubble #npLyricsBtn.on { box-shadow:inset 0 2px 3px rgba(255,255,255,.9),inset 0 -4px 8px rgba(255,255,255,.25),0 0 16px rgba(255,255,255,.8); }
+body.bubble #mini .pp:hover:not(:disabled), body.bubble #mini .skip:hover:not(:disabled) { color:#fff; }
+/* the playing / selected highlights keep their gradient in bubble mode */
+body.bubble .song.now .sb, body.bubble .plc.on .plb { --base:var(--grad); }
+body.bubble .theme-card.act { border-color:var(--hi); }
+/* HUD theme packages (e.g. Sonic Colors): the boxes take the game's menu
+   look — solid deep-navy panels with a bright cyan border, like the
+   PRESS START bar. No glass, no blur: the wallpaper is dark enough that
+   the panels sit solid on top of it. */
+body.hud .box, body.hud #customizeBox, body.hud .theme-card,
+body.hud #list, body.hud #np, body.hud #mini, body.hud #queuePanel,
+body.hud #ctxMenu, body.hud #acct, body.hud .srow, body.hud #choices,
+body.hud #box, body.hud form, body.hud .hd, body.hud #bar, body.hud #foot,
+body.hud #addMenu {
+  background-color:var(--panel);
+  background-image:none;
+  border:2px solid var(--cyan);
+  box-shadow:0 4px 16px rgba(0,0,0,.45);
+  border-radius:8px;
+}
+/* rows keep the same dark panel + cyan rim, sized to the list */
+body.hud .song .sb, body.hud .plc .plb, body.hud .item {
+  --base:var(--panel);
+  border-color:var(--cyan);
+  border-radius:6px;
+}
+/* transport buttons and the lyrics mic match the menu buttons */
+body.hud #mini .pp, body.hud #mini .skip, body.hud #npLyricsBtn {
+  background:var(--panel);
+  border:2px solid var(--cyan);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+  color:var(--text);
+}
+body.hud #npLyricsBtn.on { box-shadow:0 0 12px var(--cyan); }
+body.hud .theme-card.act { border-color:var(--hi); }
+/* HUD hover: the menu's selection outline in yellow — whatever you hover
+   gets a bright yellow outer rim and glow, like the selected Play Game
+   button in the game. */
+body.hud .item:hover, body.hud .song .sb:hover, body.hud .plc .plb:hover,
+body.hud .theme-card:hover, body.hud #mini .pp:hover, body.hud #mini .skip:hover,
+body.hud button:hover {
+  border-color:#ffef42 !important;
+  box-shadow:0 0 0 2px #ffef42, 0 0 18px rgba(255,239,66,.55) !important;
+}
 /* up-next queue panel (pops up above the player) and the right-click menu */
 #queuePanel { position:absolute; right:10px; bottom:calc(100% + 10px); width:min(340px,90vw); max-height:320px; overflow:auto; background:var(--panel); border:2px solid var(--line); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.5); padding:10px; display:none; z-index:30; }
 #queuePanel.open { display:block; }
@@ -250,18 +507,20 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
 #queueBtn .qb { position:absolute; top:-5px; right:-5px; min-width:18px; height:18px; padding:0 4px; border-radius:9px; background:var(--purple); color:#fff; font-size:11px; display:grid; place-items:center; border:0; }
 </style></head>
 <body><div id="bgpics"></div><div id="bgdim"></div><div id="app">
-  <div id="bar"><div class="logo" data-gumi></div><span>Gumi RPC</span>
+  <div id="bar"><div class="logo" data-gumi></div><span>Gumi RPC</span><span id="demoBadge" style="display:none">DEMO</span>
+    <button id="patchNotesBtn" aria-label="Patch notes" title="Patch notes"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6V2zm8 0v6h6M9 13h6M9 17h6M9 9h2"/></svg></button>
     <button class="wc" id="min" aria-label="Minimize">–</button><button class="wc" id="max" aria-label="Maximize">▢</button><button class="wc x" id="close" aria-label="Close">✕</button></div>
   <div id="mid">
     <div id="rail">
+      <div id="selbar"></div>
       <div class="top">
         <button id="tabs" aria-label="Open or close the sidebar" aria-expanded="false"><i></i><i></i><i></i></button>
         <button class="nav act" data-v="games"><span class="ni sil" style="--icon:url('assets/icons/games.png')"></span><span class="nl">Games</span></button>
         <button class="nav" data-v="music"><span class="ni sil" style="--icon:url('assets/icons/music.png')"></span><span class="nl">Music</span></button>
-        <button class="nav" data-v="marketplace" title="Marketplace — theme packs (coming soon)"><span class="ni"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4zm4 0h-2v-4h2v4z"/></svg></span><span class="nl">Marketplace</span></button>
+        <button class="nav" data-v="marketplace" title="Marketplace (theme packs, coming soon)"><span class="ni"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4zm4 0h-2v-4h2v4z"/></svg></span><span class="nl">Marketplace</span></button>
       </div>
       <div class="bot">
-        <button class="nav cust" data-v="customize" title="Customize — themes, fonts, colours"><span class="ni"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></span><span class="nl">Customize</span></button>
+        <button class="nav cust" data-v="customize" title="Customize (themes, fonts, colours)"><span class="ni"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></span><span class="nl">Customize</span></button>
         <button class="nav" data-v="settings"><span class="ni sil" style="--icon:url('assets/icons/settings.png')"></span><span class="nl">Settings</span></button>
         <button class="nav" id="me" title="Sign in with Discord"><span class="av"></span><span class="nl" id="meName">Sign in</span></button>
       </div>
@@ -281,10 +540,11 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
           <div id="cards"><h3 class="sec">Albums</h3><div id="albums"></div><h3 class="sec" id="plHead">Playlists</h3><div id="pls"></div></div>
           <div class="lh"><h3 id="listTitle">All songs</h3><div class="row"><button id="playAll">▶ Play all</button><button id="shufAll">Shuffle</button></div></div>
           <div id="songs"></div></section>
-        <aside id="np" class="off"><div class="cd big"></div><div id="npTitle">Title</div><div id="npBy">By author</div>
+        <aside id="np" class="off"><button id="npLyricsBtn" aria-label="Lyrics" title="Lyrics"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg></button><button id="npEqBtn" aria-label="Equalizer" title="Equalizer"><svg viewBox="0 0 24 24"><path d="M4 6h2v12H4zM8 4h2v16H8zM12 8h2v8h-2zM16 5h2v14h-2zM20 9h2v6h-2z"/></svg></button><div id="npEqView"><div class="npEqHead">Equalizer</div><div id="npEqSliders"></div><div class="eqModes"><button data-eq="flat">Flat</button><button data-eq="bass">Bass boost</button><button data-eq="vocal">Vocal / Podcasts</button><button data-eq="treble">Treble</button><button data-eq="clarity">Clarity</button><button data-eq="custom">Custom</button></div><label class="srow"><span>8D audio<small>Experimental. The sound slowly sweeps around a huge hall, like it is swaying side to side. Free.</small></span><span class="sw"><input type="checkbox" id="eq8d"><i></i></span></label></div><div id="npPlayer"><div class="cd big"></div><div id="npTitle">Title</div><div id="npBy">By author</div>
           <div class="tl"><span class="js-cur">0:00</span><input class="js-seek" type="range" min="0" max="1000" value="0" aria-label="Seek"><span class="js-dur">0:00</span></div><div class="ctl"><button class="skip js-shuf" aria-label="Shuffle"></button><button class="skip js-prev" aria-label="Previous song"><svg viewBox="0 0 24 24"><path d="M5 5h2.6v14H5zM20 5v14L9 12z"/></svg></button><button class="pp js-pp" aria-label="Play or pause"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><button class="skip js-next" aria-label="Next song"><svg viewBox="0 0 24 24"><path d="M16.4 5H19v14h-2.6zM4 5v14l11-7z"/></svg></button><button class="skip js-loop" aria-label="Loop"></button></div>
           <div class="volrow"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9z"/><path d="M15.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input class="js-vol" type="range" min="0" max="100" value="70" aria-label="Volume"></div>
-          <div id="npUp"><div class="npUpHead">Up next <button id="npQueueClear">Clear</button></div><div id="npQueue"></div></div></aside>
+          <div id="npUp"><div class="npUpHead">Up next <button id="npQueueClear">Clear</button></div><div id="npQueue"></div></div></div>
+          <div id="npLyrics"><div class="npLyricsHead">Lyrics</div><div id="npLyricsStatus" class="muted"></div><div id="npLyricLines"></div></div></aside>
       </div>
       <div id="settingsView" class="off"><div class="box">
         <h2>Settings</h2>
@@ -292,12 +552,22 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
         <label class="srow"><span>Retro scanlines<small>The faint TV lines over the whole app</small></span><span class="sw"><input type="checkbox" id="s-scan"><i></i></span></label>
         <label class="srow"><span>Discord Application ID<small>The long number from your application’s General Information page. Needed for sign-in and music</small></span><input type="text" id="s-appid" style="width:230px" placeholder="123456789012345678"></label>
         <label class="srow"><span>Show what I’m listening to on Discord<small>Your current song appears as “Listening to…” when no game is running</small></span><span class="sw"><input type="checkbox" id="s-music"><i></i></span></label>
+        <label class="srow"><span>Gapless playback<small>Next song starts instantly, no silence between tracks</small></span><span class="sw"><input type="checkbox" id="s-gapless"><i></i></span></label>
         <label class="srow"><span>Show the artist as “Listening to…”<small>Discord shows “Listening to [artist]” at the top. The artist still shows in the line below even if Discord ignores this, so turn it off to go back to “Listening to Gumi RPC”.</small></span><span class="sw"><input type="checkbox" id="s-artist"><i></i></span></label>
-        <label class="srow"><span>Spinning CD from the album cover<small>Uploads each album’s cover, as a small spinning GIF, to catbox.moe (a free public image site) so Discord can show it</small></span><span class="sw"><input type="checkbox" id="s-cdup"><i></i></span></label>
-        <label class="srow"><span>Fallback CD picture<small>Shown while the album CD is being made, or if it can’t be. Use the asset name you gave the picture in the Developer Portal (try “cd” — just the name, no .gif). Discord shows uploaded assets as still pictures, not animated GIFs. For animation, use a direct https:// link to a GIF instead, and press “Check the music picture” below.</small></span><input type="text" id="s-cd" style="width:190px"></label>
+        <div>
+          <div class="shead">CD<small>What the spinning CD shows, on Discord and in the app. The two are fully independent.</small></div>
+          <label class="srow"><span>CD Rich Presence<small>Discord shows the spinning CD made from the album cover. Off shows the regular album cover on Discord instead.</small></span><span class="sw"><input type="checkbox" id="s-cdup"><i></i></span></label>
+          <label class="srow"><span>CD in the app<small>The Now Playing panel and the mini player show the spinning CD. Off shows the full album cover in the app instead.</small></span><span class="sw"><input type="checkbox" id="s-cdinapp"><i></i></span></label>
+          <label class="srow" id="cdHoleRow"><span>CD hole<small>The small hole in the middle of the spinning CD. Off hides it so the album cover stays whole.</small></span><span class="sw"><input type="checkbox" id="s-cdhole"><i></i></span></label>
+        </div>
+        <label class="srow"><span>Fallback CD picture<small>Shown while the album CD is being made, or if it can’t be. Use the asset name you gave the picture in the Developer Portal (try “cd”, just the name, no .gif). Discord shows uploaded assets as still pictures, not animated GIFs. For animation, use a direct https:// link to a GIF instead, and press “Check the music picture” below.</small></span><input type="text" id="s-cd" style="width:190px"></label>
         <button id="s-cdtest">Check the music picture on Discord</button>
         <button id="s-log">Open the Discord problem log</button>
         <button id="s-intro">Show Gumi’s intro again</button>
+        <div id="devRow" style="display:none">
+          <div class="shead">Developer<small>Only on this dev copy. Showcasing mode swaps the real library for sample content, so a screenshot or a video never shows anyone else’s albums.</small></div>
+          <label class="srow"><span>Showcasing mode<small>Shows the sample library (made-up games and albums) instead of your real library. Nothing is saved while it’s on. Turn it off and your real library comes straight back.</small></span><span class="sw"><input type="checkbox" id="s-devmode"><i></i></span></label>
+        </div>
         <div>
           <div class="shead">Updates<small>Gumi RPC checks for updates when it opens and downloads them in the background. A new version installs when you restart the app.</small></div>
           <div class="pick"><button id="s-update">Check for updates</button><span id="updateStatus" class="muted"></span><button id="s-restart" class="off">Restart to install update</button></div>
@@ -305,7 +575,7 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
       </div></div>
       <div id="customizeView" class="off"><div class="box">
         <h2>Customize</h2>
-        <p class="muted" style="margin:0 0 6px;font-size:15px">Make Gumi RPC yours — themes, fonts, colours, icons and glow</p>
+        <p class="muted" style="margin:0 0 6px;font-size:15px">Make Gumi RPC yours: themes, fonts, colours, icons and glow</p>
         <div id="customizeBox">
           <label class="srow"><span>Neon glow<small>Glowing text and stronger glow on buttons and the active theme</small></span><span class="sw"><input type="checkbox" id="s-neon"><i></i></span></label>
           <div>
@@ -318,28 +588,29 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
             <div class="iconprev"><span class="ni sil" style="--icon:url('assets/icons/games.png')"></span><span class="ni sil" style="--icon:url('assets/icons/music.png')"></span><span class="ni sil" style="--icon:url('assets/icons/settings.png')"></span><label class="cfield" style="flex:1">Icon colour <input type="color" id="c-icon"></label><button id="iconReset">Reset</button></div>
           </div>
           <div>
-            <div class="shead">Theme<small>Tap a theme to switch to it — you never have to delete one to change it. The accent colour changes with the theme.</small></div>
+            <div class="shead">Theme<small>Tap a theme to switch to it. You never have to delete one to change it. The accent colour changes with the theme.</small></div>
             <div id="themes"><button data-t="neutral">Neutral</button><button data-t="light">Light</button><button data-t="midnight">Midnight</button></div>
-            <div class="shead" style="margin-top:10px">My themes<small>Add a picture as a theme — the whole interface takes its colours from the picture automatically, and you can change the accent on the card if you like. Best picture ratio is 16:9 (1920×1080). If a picture does not fit, change Fit / Position / Zoom below — Cover fills the box (crops the edges), Contain shows the whole picture.</small></div>
+            <div class="shead" style="margin-top:10px">My themes<small>Add a picture as a theme. The whole interface takes its colours from the picture automatically, and you can change the accent on the card if you like. Best picture ratio is 16:9 (1920×1080). If a picture does not fit, change Fit / Position / Zoom below. Cover fills the box (crops the edges), Contain shows the whole picture.</small></div>
+            <input id="themeSearch" type="search" placeholder="Search themes…" aria-label="Search themes" style="width:100%;margin-bottom:10px">
             <div id="myThemes"></div>
-            <div class="pick" style="margin-top:8px"><button id="addTheme">+ Add theme from picture</button></div>
+            <div class="pick" style="margin-top:8px"><button id="addTheme">+ Add theme from picture</button><button id="importTheme" style="margin-left:8px">Import theme package</button></div>
             <div id="themeEditor" class="off"></div>
           </div>
           <div>
-            <div class="shead">Sound effects<small>Pick your own sounds for each moment — hover a row to hear it, and set any volume you like. Volume 0 silences that sound.</small></div>
+            <div class="shead">Sound effects<small>Pick your own sounds for each moment. Hover a row to hear it, and set any volume you like. Volume 0 silences that sound.</small></div>
             <div id="sndRows"></div>
           </div>
         </div>
       </div></div>
       <div id="marketplaceView" class="off"><div class="box">
         <h2>Marketplace</h2>
-        <p class="muted" style="margin:0 0 6px;font-size:15px">Coming soon — theme packs made by people, for people.</p>
+        <p class="muted" style="margin:0 0 6px;font-size:15px">Coming soon: theme packs made by people, for people.</p>
         <div id="customizeBox">
           <p style="margin:0">When the marketplace opens, you’ll be able to browse packs other people made and use them right here in Gumi RPC:</p>
-          <div class="shead">Multi-picture themes<small>One picture for the background, another for the sidebar and panels — a theme can be a whole look, not just one image.</small></div>
+          <div class="shead">Multi-picture themes<small>One picture for the background, another for the sidebar and panels. A theme can be a whole look, not just one image.</small></div>
           <div class="shead">Theme sound effects<small>Packs can bring their own clicks, blips and launch sounds, so a theme sounds like it looks.</small></div>
           <div class="shead">Made by the community<small>Make your own wallpapers and themes, and put them up for other people to use.</small></div>
-          <p class="muted" style="margin:0;font-size:14px">Nothing to buy here yet — this spot is ready and waiting for when the marketplace opens.</p>
+          <p class="muted" style="margin:0;font-size:14px">Nothing to buy here yet. This spot is ready and waiting for when the marketplace opens.</p>
         </div>
       </div></div>
       <div id="mini"><div class="cd sm"></div>
@@ -348,7 +619,8 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
         <div id="queuePanel"><h3>Up next <button id="queueClear">Clear</button></h3><div id="queueList"></div></div></div>
     </div>
   </div>
-  <div id="foot"><div class="btns"><button id="add">+ Add Games</button><button id="addMusic" class="off">+ Add Music</button><button id="mkpl" class="off">Make Playlist</button><div id="addMenu"><button data-m="files">Single song(s)</button><button data-m="folder">Album (a whole folder)</button></div></div><button id="ask"><div class="logo" data-gumi></div>Ask Gumi</button></div>
+  <div id="foot"><div class="btns"><button id="add">+ Add Games</button><button id="addMusic" class="off">+ Add Music</button><button id="mkpl" class="off">Make Playlist</button><div id="addMenu"><button data-m="files">Single song(s)</button><button data-m="folder">Album (a whole folder)</button></div></div><button id="themeMusicToggle" style="display:none" title="Theme music"></button><span id="themeMusicNow" style="display:none"></span><button id="ask"><div class="logo" data-gumi></div>Ask Gumi</button></div>
+  <div id="themeCursor"></div>
 </div>
 
 <div id="modal"><form id="form">
@@ -373,6 +645,8 @@ body[data-theme="custom"] #bgpics, body[data-theme="custom"] #bgdim { display:bl
   <div id="p-sw"><label>Songs in this playlist</label><div id="p-songs"></div></div>
   <div class="pick"><button type="submit" style="--base:var(--grad);--fill:var(--cyan)">Save playlist</button><button type="button" id="p-cancel">Cancel</button><button type="button" id="p-del" style="display:none;--fill:#ff3d6e">Delete</button></div>
 </form></div>
+<div id="patchNotesModal"><div id="patchNotesBox"><div class="pnHead"><h2>Patch notes</h2><button id="patchNotesClose" aria-label="Close patch notes">✕</button></div><div id="patchNotesList"></div></div></div>
+<div id="albumDetail" class="off"><button id="adBack" aria-label="Back to albums" title="Back">←</button><div id="adSwitch"></div><div id="adHero"><div id="adCover"></div><div id="adMeta"><h2 id="adTitle"></h2><div id="adSub" class="muted"></div></div></div><div id="adSongs"></div></div>
 <div id="vn"><div id="spot" class="none"></div>
   <div id="wrap"><div id="choices"></div>
     <div id="box"><div id="sprite"></div><div class="say"><small>Gumi</small><div id="txt"></div><span id="nxt2">▼</span></div></div></div></div>
@@ -384,8 +658,12 @@ var GUMI_SVG = '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><c
 // Drop your own Gumi art at assets/gumi.png and it replaces this ball automatically
 var GUMI = '<img src="assets/gumi.png" alt="" style="image-rendering:pixelated" onerror="this.outerHTML=GUMI_SVG">';
 const $ = (s) => document.querySelector(s);
-const sfx = (n) => { const s = S.sounds[n]; if (!s || !s.vol) return; const a = new Audio(s.file ? fileUrl(s.file) : `assets/sfx/${n}.wav`); a.volume = s.vol / 100; a.play().catch(() => {}); }; // click, launch — your own file + any volume (0 = silent)
-const fileUrl = (p) => { const s = p.replace(/\\/g, '/').split('/'); return 'file:///' + s[0] + '/' + s.slice(1).map(encodeURIComponent).join('/'); };
+const sfx = (n) => { const s = S.sounds[n]; if (!s || !s.vol) return; const t = activeTheme(); const f = (n === 'click' && t?.click) ? t.click : s.file; const a = new Audio(f ? fileUrl(f) : `assets/sfx/${n}.wav`); a.volume = s.vol / 100; a.play().catch(() => {}); }; // click, launch — your own file + any volume (0 = silent); a theme package's click wins while it is active
+// Theme packages ship their files inside the app (assets/themes/…), so a
+// relative path is already a working page-relative URL — only absolute
+// paths (user-picked files) need turning into file:/// URLs.
+const fileUrl = (p) => { if (!p) return ''; if (!/^[a-zA-Z]:[\\/]/.test(p) && !p.startsWith('/')) return p.replace(/\\/g, '/'); const s = p.replace(/\\/g, '/').split('/'); return 'file:///' + s[0] + '/' + s.slice(1).map(encodeURIComponent).join('/'); };
+const activeTheme = () => S.theme === 'custom' ? S.customThemes.find((t) => t.id === S.activeTheme) : null;
 const iconUrl = (p) => p ? fileUrl(p) : '';
 document.querySelectorAll('[data-gumi]').forEach((e) => e.innerHTML = GUMI);
 $('#sprite').innerHTML = GUMI; $('#me .av').innerHTML = GUMI;
@@ -396,14 +674,51 @@ function toast(m) { const t = $('#toast'); t.textContent = m; t.style.display = 
 
 /* window + views */
 ['min', 'max', 'close'].forEach((a) => $('#' + a).onclick = () => api.win(a));
+/* Patch notes: the notepad at the top right opens a re-readable panel.
+   The notes live in patch-notes.json (Brandon edits it, and the release
+   script adds new entries when it ships). Latest version first. */
+async function openPatchNotes() {
+  const list = $('#patchNotesList'); list.innerHTML = '';
+  let notes = [];
+  try { notes = await api.getPatchNotes(); } catch {}
+  if (!notes || !notes.length) { list.innerHTML = '<p class="muted">No patch notes yet.</p>'; }
+  else notes.forEach((entry) => {
+    const v = document.createElement('div'); v.className = 'pnVer'; v.textContent = 'Version ' + (entry.version || '');
+    const d = document.createElement('div'); d.className = 'pnDate'; d.textContent = entry.date || '';
+    list.append(v, d);
+    // Gumi-Auto writes a heading + subheading for each release; older
+    // entries only have a notes list, so both render if present.
+    if (entry.heading) { const h = document.createElement('div'); h.className = 'pnHead'; h.textContent = entry.heading; list.append(h); }
+    if (entry.subheading) { const s = document.createElement('div'); s.className = 'pnSub'; s.textContent = entry.subheading; list.append(s); }
+    const ul = document.createElement('ul');
+    (entry.notes || []).forEach((n) => { const li = document.createElement('li'); li.textContent = n; ul.append(li); });
+    list.append(ul);
+  });
+  $('#patchNotesModal').classList.add('open');
+}
+$('#patchNotesBtn').onclick = () => { sfx('click'); openPatchNotes(); };
+$('#patchNotesClose').onclick = () => $('#patchNotesModal').classList.remove('open');
+$('#patchNotesModal').onclick = (e) => { if (e.target === $('#patchNotesModal')) $('#patchNotesModal').classList.remove('open'); };
 const VIEWS = ['games', 'music', 'settings', 'customize', 'marketplace'];
+/* the title-screen selection bar (Persona 3): one blue bar that glides
+   behind the active nav item. The bar itself is #selbar, hidden unless
+   the active theme's CSS shows it — the app just keeps it parked on the
+   active button, and the theme decides whether it is visible at all. */
+function positionSelBar() {
+  const bar = $('#selbar'); if (!bar) return;
+  const act = document.querySelector('.nav[data-v].act'); if (!act) return;
+  bar.style.top = act.offsetTop + 'px';
+  bar.style.height = act.offsetHeight + 'px';
+}
 function setView(v) {
   VIEWS.forEach((n) => $('#' + n + 'View').classList.toggle('off', n !== v));
   document.querySelectorAll('.nav[data-v]').forEach((b) => b.classList.toggle('act', b.dataset.v === v));
+  positionSelBar();
   $('#add').classList.toggle('off', v === 'music'); $('#addMusic').classList.toggle('off', v !== 'music'); $('#mkpl').classList.toggle('off', v !== 'music');
   setMiniMode(v);
+  moveThemeCursor(() => document.querySelector('.nav.act'), 'right');
 }
-$('#tabs').onclick = (e) => { e.stopPropagation(); sfx('click'); $('#tabs').setAttribute('aria-expanded', $('#rail').classList.toggle('open')); layoutBigBar(); setTimeout(layoutBigBar, 350); };
+$('#tabs').onclick = (e) => { e.stopPropagation(); sfx('click'); $('#tabs').setAttribute('aria-expanded', $('#rail').classList.toggle('open')); layoutBigBar(); layoutBigBarTrack(); setTimeout(layoutBigBar, 350); };
 document.addEventListener('click', () => $('#acct').classList.remove('open'));
 document.querySelectorAll('.nav[data-v]').forEach((b) => b.onclick = () => { sfx('click'); setView(b.dataset.v); });
 
@@ -426,6 +741,51 @@ function layoutBigBar() {
   mini.style.left = railW + 'px';
   mini.style.width = Math.max(280, w) + 'px';
 }
+/* the sidebar widens/narrows over .3s — the big bar must track its live
+   width frame by frame, or it overlaps the sidebar while it opens and
+   leaves a gap while it closes until the 350ms timeout corrects it.
+   The theme cursor rides the same loop — the ball glides beside whatever
+   it tracks, so it has to be re-placed every frame too, or it ends up
+   floating in the wallpaper once the rail has moved.
+   The bar's own .45s morph transition would make it glide toward each
+   frame's target instead of tracking the rail live, so the loop suppresses
+   it with .tracking (same pattern as .dragging) and restores it when the
+   loop stops, with one final layout at the exact settled geometry. */
+let railBarRaf = null, railBarFallback = null, railBarStop = null;
+function layoutBigBarTrack() {
+  if (railBarStop) railBarStop(); // a fast re-toggle replaces the old loop
+  const rail = $('#rail');
+  let done = false;
+  const stop = () => {
+    if (done) return; done = true;
+    if (railBarRaf !== null) { cancelAnimationFrame(railBarRaf); railBarRaf = null; }
+    if (railBarFallback !== null) { clearTimeout(railBarFallback); railBarFallback = null; }
+    rail.removeEventListener('transitionend', onRailEnd);
+    if (railBarStop === stop) railBarStop = null;
+    mini.classList.remove('tracking');
+    layoutBigBar(); // final layout at the settled geometry, transition restored
+    positionThemeCursor(); // final place at the settled geometry
+  };
+  // only the rail's own width transition ends the loop — the nav buttons'
+  // width transitions bubble up here too and must not stop it early.
+  // stop() does the final layout once, after restoring the transition.
+  const onRailEnd = (ev) => { if (ev.target === rail && ev.propertyName === 'width') stop(); };
+  const tick = () => { if (done) return; layoutBigBar(); positionThemeCursor(); railBarRaf = requestAnimationFrame(tick); };
+  railBarStop = stop;
+  // suppress the bar's morph transition while tracking, so each frame's
+  // layout lands instantly; only the bar needs it (the pill has no rail to track)
+  if (mini.classList.contains('big')) mini.classList.add('tracking');
+  rail.addEventListener('transitionend', onRailEnd);
+  railBarRaf = requestAnimationFrame(tick);
+  railBarFallback = setTimeout(stop, 400); // the .3s transition, plus slack
+}
+/* keep a freely placed pill on screen: its bottom must never go below the
+   footer's top, or it would end up hidden (and ungrabbable) behind the footer */
+function clampMiniPos(x, y) {
+  const footH = document.querySelector('#foot').offsetHeight;
+  const w = mini.offsetWidth, h = mini.offsetHeight;
+  return { x: Math.max(0, Math.min(innerWidth - w, x)), y: Math.max(42, Math.min(innerHeight - h - footH, y)) };
+}
 function setMiniMode(v) {
   if (v === 'music') {
     mini.classList.add('big'); mini.classList.remove('free', 'dragging');
@@ -438,13 +798,25 @@ function setMiniMode(v) {
     const p = S.miniPos;
     if (p && isFinite(p.x) && isFinite(p.y)) {
       mini.classList.add('free');
-      mini.style.left = p.x + 'px'; mini.style.top = p.y + 'px'; mini.style.bottom = 'auto'; mini.style.transform = 'none';
+      // rescue positions saved too low (before the clamp existed) by writing
+      // the corrected values back, so a stuck pill fixes itself on next load
+      const c = clampMiniPos(p.x, p.y);
+      if (c.x !== p.x || c.y !== p.y) { S.miniPos = { x: c.x, y: c.y }; saveS(); }
+      mini.style.left = c.x + 'px'; mini.style.top = c.y + 'px'; mini.style.bottom = 'auto'; mini.style.transform = 'none';
     } else {
       mini.style.left = ''; mini.style.top = ''; mini.style.bottom = ''; mini.style.transform = '';
     }
   }
 }
-addEventListener('resize', () => layoutBigBar());
+addEventListener('resize', () => {
+  layoutBigBar();
+  // a shrunken window must not push a freely placed pill under the footer
+  if (!mini.classList.contains('big') && mini.classList.contains('free')) {
+    const c = clampMiniPos(parseFloat(mini.style.left) || 0, parseFloat(mini.style.top) || 0);
+    mini.style.left = c.x + 'px'; mini.style.top = c.y + 'px';
+    if (S.miniPos && (c.x !== S.miniPos.x || c.y !== S.miniPos.y)) { S.miniPos = { x: c.x, y: c.y }; saveS(); }
+  }
+});
 mini.addEventListener('pointerdown', (e) => {
   if (mini.classList.contains('big')) return;
   if (e.target.closest('button, input, canvas, a')) return; // controls keep working
@@ -453,9 +825,8 @@ mini.addEventListener('pointerdown', (e) => {
   mini.classList.add('dragging', 'free');
   mini.style.left = r.left + 'px'; mini.style.top = r.top + 'px'; mini.style.bottom = 'auto'; mini.style.transform = 'none';
   const move = (ev) => {
-    const w = mini.offsetWidth, h = mini.offsetHeight;
-    mini.style.left = Math.max(0, Math.min(innerWidth - w, ev.clientX - ox)) + 'px';
-    mini.style.top = Math.max(42, Math.min(innerHeight - h, ev.clientY - oy)) + 'px';
+    const c = clampMiniPos(ev.clientX - ox, ev.clientY - oy);
+    mini.style.left = c.x + 'px'; mini.style.top = c.y + 'px';
   };
   const up = () => {
     removeEventListener('pointermove', move); removeEventListener('pointerup', up);
@@ -471,7 +842,35 @@ mini.addEventListener('dblclick', (e) => {
 });
 
 /* games */
-async function refresh() { games = await api.getLibrary(); render(); }
+/* Developer / Showcasing mode: sample content that stands in for the
+   real library while Brandon shows the app off — so a screenshot or a
+   video never shows anyone else's albums. The demo games and albums are
+   made-up (generated placeholder art + one generated ambient track, so
+   nothing in here belongs to another artist), and the demo library lives
+   only in memory: it is never written to %APPDATA%, and flipping the
+   mode off brings the real library straight back. The mode itself only
+   exists on a dev copy (see the `dev-mode` marker file in main.js). */
+const DEMO = {
+  games: [
+    { id: 'demo-game-starlight', name: 'Starlight Drift', icon: 'assets/demo/game-starlight.png', details: 'Drifting through the stars' },
+    { id: 'demo-game-pixel', name: 'Pixel Quest', icon: 'assets/demo/game-pixel.png', details: 'A tiny hero, a big quest' },
+    { id: 'demo-game-neon', name: 'Neon Runner', icon: 'assets/demo/game-neon.png', details: 'Outrunning the grid' },
+  ],
+  lib: {
+    tracks: [
+      { id: 'demo-track-1', title: 'Sunset Waves', artist: 'Demo Artist', albumId: 'demo-album-sunset', path: 'assets/demo/demo-ambient.mp3' },
+      { id: 'demo-track-2', title: 'Midnight Static', artist: 'Demo Artist', albumId: 'demo-album-midnight', path: 'assets/demo/demo-ambient.mp3' },
+    ],
+    playlists: [],
+    albums: [
+      { id: 'demo-album-sunset', name: 'Sunset Waves', cover: 'assets/demo/album-sunset.png' },
+      { id: 'demo-album-midnight', name: 'Midnight Static', cover: 'assets/demo/album-midnight.png' },
+    ],
+  },
+};
+const demoLib = () => JSON.parse(JSON.stringify(DEMO.lib));
+const demoGames = () => DEMO.games.map((g) => ({ ...g }));
+async function refresh() { games = S.devMode ? demoGames() : await api.getLibrary(); render(); }
 function render() {
   if (!sel()) selId = games[0]?.id || null;
   const L = $('#items'); L.innerHTML = '';
@@ -479,16 +878,17 @@ function render() {
     const b = document.createElement('button'); b.className = 'item' + (g.id === selId ? ' sel' : '') + (g.id === runningId ? ' live' : '');
     b.innerHTML = '<span class="ic"></span><span class="nm"></span>';
     if (g.icon) b.firstChild.style.backgroundImage = `url("${iconUrl(g.icon)}")`;
-    b.lastChild.textContent = g.name; b.onclick = () => { sfx('click'); selId = g.id; render(); }; L.appendChild(b);
+    b.lastChild.textContent = g.name; b.onclick = () => { sfx('click'); selId = g.id; render(); moveThemeCursor(() => document.querySelector('.item.sel'), 'left'); }; L.appendChild(b);
   });
   const g = sel(), c = $('#cover');
   $('#count').textContent = games.length + (games.length === 1 ? ' game' : ' games');
   c.style.backgroundImage = g?.icon ? `url("${iconUrl(g.icon)}")` : '';
-  c.innerHTML = g?.icon ? '' : `<div class="empty">${GUMI}<p>${g ? 'No art yet. Edit this game to add some!' : 'Nothing here yet. Add your first game!'}</p></div>`;
+  c.innerHTML = g?.icon ? '' : `<div class="empty">${gumiArt()}<p>${g ? 'No art yet. Edit this game to add some!' : 'Nothing here yet. Add your first game!'}</p></div>`;
   $('#title').textContent = g ? g.name : 'No game picked';
   $('#sub').textContent = g ? (g.details || 'No presence text yet') : '';
   $('#play').textContent = g && runningId === g.id ? 'Playing…' : 'Play';
   ['#play', '#edit', '#rpc'].forEach((s) => $(s).disabled = !g);
+  positionThemeCursor();
 }
 $('#play').onclick = async () => {
   const g = sel(); if (!g) return; sfx('launch'); const r = await api.launch(g.id);
@@ -502,7 +902,7 @@ api.onClosed(({ id, error }) => { if (runningId === id) runningId = null; render
 let me = null;
 function showMe() {
   const b = $('#me'), av = $('#me .av'), a = $('#acct'); a.innerHTML = '';
-  if (me?.avatar) { const i = new Image(); i.alt = ''; i.src = me.avatar; av.replaceChildren(i); } else av.innerHTML = GUMI;
+  if (me?.avatar) { const i = new Image(); i.alt = ''; i.src = me.avatar; av.replaceChildren(i); } else av.innerHTML = gumiArt();
   b.title = me ? me.name : 'Sign in with Discord'; $('#meName').textContent = me ? me.name : 'Sign in';
   const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c; if (txt) n.textContent = txt; return n; };
   if (me) {
@@ -544,16 +944,28 @@ $('#scan').onclick = async () => {
 };
 $('#browse').onclick = async () => { const p = await api.pickExe(); if (p) useExe(p); };
 $('#icon').onclick = async () => { const p = await api.pickIcon(); if (p) { cur.icon = p; $('#preview').style.backgroundImage = `url("${iconUrl(p)}")`; } };
-$('#del').onclick = async () => { await api.deleteGame(cur.id); closeModal(); refresh(); };
+$('#del').onclick = async () => { if (S.devMode) return toast('Demo mode. Nothing here is saved'); await api.deleteGame(cur.id); closeModal(); refresh(); };
 $('#form').onsubmit = async (e) => {
   e.preventDefault(); if (!$('#f-exe').value) return toast('Pick an .exe first');
   Object.assign(cur, { name: $('#f-name').value.trim(), clientId: $('#f-client').value.trim(), details: $('#f-details').value.trim(),
     state: $('#f-state').value.trim(), imageKey: $('#f-image').value.trim(), showTimer: $('#f-timer').checked });
+  if (S.devMode) { toast('Demo mode. Nothing here is saved'); closeModal(); return; }
   await api.saveGame(cur); selId = cur.id; sfx('click'); closeModal(); refresh();
 };
 
 /* music */
-const audio = new Audio(); audio.volume = .7;
+/* Gapless playback: two audio elements take turns. `audio` is the one
+   playing right now; the other one quietly preloads the next track, so
+   when the current song ends the next one can start instantly — no
+   silence, no overlap. Every handler below is attached to both elements,
+   and everything else reads the `audio` variable, so it always follows
+   whichever element is active. */
+const audioA = new Audio(); audioA.volume = .7; audioA.preload = 'auto';
+const audioB = new Audio(); audioB.volume = .7; audioB.preload = 'auto';
+let audio = audioA;
+let gaplessTrack = null; // id of the track preloaded in the standby element
+const standbyEl = () => audio === audioA ? audioB : audioA;
+const gaplessOn = () => S.gapless !== false; // on by default — even for old installs that never stored the setting
 const all = (s) => document.querySelectorAll(s);
 const I = {
   play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
@@ -566,8 +978,8 @@ const fmt = (s) => isFinite(s) ? Math.floor(s / 60) + ':' + String(Math.floor(s 
 let lib = { tracks: [], playlists: [], albums: [] }, view = null, ctxId = null, curList = [];
 let queue = [], order = [], pos = 0, curId = null, seeking = false, shuffle = false, loop = 0; // loop: 0 off, 1 all, 2 one
 let upNext = []; // songs queued by hand (right-click) — they play before the rest of the list
-const covers = new Map(), peaks = new Map(), byId = (id) => lib.tracks.find((t) => t.id === id), persist = () => api.saveMusic(lib);
-async function loadMusic() { lib = Object.assign({ tracks: [], playlists: [], albums: [] }, await api.getMusic()); renderMusic(); }
+const covers = new Map(), peaks = new Map(), byId = (id) => lib.tracks.find((t) => t.id === id), persist = () => { if (S.devMode) return; api.saveMusic(lib); };
+async function loadMusic() { lib = S.devMode ? demoLib() : Object.assign({ tracks: [], playlists: [], albums: [] }, await api.getMusic()); renderMusic(); }
 
 const syncUI = () => {
   all('.js-pp').forEach((b) => b.innerHTML = audio.paused ? I.play : I.pause);
@@ -584,16 +996,101 @@ const syncUI = () => {
    analyser goes quiet and the wave falls back to the track's shape. */
 const wave = $('#wave');
 let actx = null, analyser = null, freqData = null;
-function ensureAnalyser() { // wire the player through an analyser, once
-  if (analyser) return true;
-  try {
-    actx = new (window.AudioContext || window.webkitAudioContext)();
-    const src = actx.createMediaElementSource(audio);
-    analyser = actx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = .75;
-    src.connect(analyser); analyser.connect(actx.destination);
-    freqData = new Uint8Array(analyser.frequencyBinCount);
-    return true;
-  } catch { return false; }
+const analyserWired = new Set(); // elements already given a MediaElementSource (calling it twice on one element throws)
+/* Equalizer + 8D audio: five BiquadFilter bands in series, then a
+   StereoPanner for the 8D effect, then the analyser, then the speakers.
+   Both audio elements feed the same chain, so the EQ applies to
+   whichever one is playing (and survives the gapless swap). The 8D
+   effect is an LFO (a slow oscillator) swinging the pan left and right —
+   it is experimental, and free, like every EQ mode. */
+let eqFilters = null, eqPanner = null, eqLfo = null, eqLfoGain = null, eqLfoRunning = false, eqOpen = false;
+let eqDry = null, eqWet = null, eqConv = null; // the 8D room: dry sound + a reverb (convolver) mixed under it
+const EQ_BANDS = [60, 230, 910, 4000, 14000]; // Hz; lowshelf, 3x peaking, highshelf
+const EQ_MODES = {
+  flat: [0, 0, 0, 0, 0],
+  bass: [8, 3, 0, -1, -2],
+  vocal: [-4, 1, 4, 2, 1],
+  treble: [-3, -1, 0, 3, 6],
+  clarity: [-2, 0, 2, 4, 4],
+};
+const EQ_LABELS = ['60 Hz', '230 Hz', '910 Hz', '4 kHz', '14 kHz'];
+function eqGains() { // the gains in effect right now — a preset, or the saved custom sliders
+  if (S.eqMode === 'custom') return (Array.isArray(S.eqCustom) && S.eqCustom.length === 5) ? S.eqCustom : EQ_MODES.flat;
+  return EQ_MODES[S.eqMode] || EQ_MODES.flat;
+}
+function makeImpulse(ctx, duration, decay) { // an empty room, synthesized: noise fading away over ~1 second
+  const rate = ctx.sampleRate, len = Math.floor(rate * duration);
+  const buf = ctx.createBuffer(2, len, rate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  }
+  return buf;
+}
+function buildEqChain() { // called once, when the AudioContext is made
+  eqFilters = EQ_BANDS.map((freq, i) => {
+    const f = actx.createBiquadFilter();
+    f.type = i === 0 ? 'lowshelf' : i === EQ_BANDS.length - 1 ? 'highshelf' : 'peaking';
+    f.frequency.value = freq; f.Q.value = 1; f.gain.value = 0;
+    return f;
+  });
+  for (let i = 0; i < eqFilters.length - 1; i++) eqFilters[i].connect(eqFilters[i + 1]);
+  eqPanner = actx.createStereoPanner(); eqPanner.pan.value = 0;
+  eqFilters[eqFilters.length - 1].connect(eqPanner);
+  // the 8D room: the dry sound pans left and right, but the reverb taps
+  // off BEFORE the panner, so the room itself stays centred — the sound
+  // moves around inside it, instead of the whole room swinging with it.
+  // That is what makes it feel like the music is circling you in a room
+  // rather than just sliding between your ears. The wet mix is 0 while
+  // 8D is off, so the reverb only exists while 8D is on.
+  eqDry = actx.createGain(); eqDry.gain.value = 1;
+  eqWet = actx.createGain(); eqWet.gain.value = 0;
+  eqConv = actx.createConvolver(); eqConv.buffer = makeImpulse(actx, 2.5, 2.2); // a huge hall, not a small room
+  eqPanner.connect(eqDry); eqDry.connect(analyser);
+  eqFilters[eqFilters.length - 1].connect(eqConv); eqConv.connect(eqWet); eqWet.connect(analyser);
+  // the 8D sweep: a slow oscillator swinging the pan left and right.
+  // The gain node is permanent; the oscillator itself is made fresh each
+  // time 8D turns on, because an oscillator can only ever be started once.
+  eqLfoGain = actx.createGain(); eqLfoGain.gain.value = 0.9; // how far the pan swings
+  eqLfoGain.connect(eqPanner.pan);
+  applyEq();
+}
+function start8d() { // one full left-right sweep every ~11 seconds
+  if (eqLfoRunning) return;
+  eqLfo = actx.createOscillator(); eqLfo.frequency.value = 0.09;
+  eqLfo.connect(eqLfoGain); eqLfo.start(); eqLfoRunning = true;
+}
+function stop8d() {
+  if (!eqLfoRunning) return;
+  try { eqLfo.stop(); } catch {}
+  eqLfoRunning = false;
+  if (eqPanner) eqPanner.pan.setTargetAtTime(0, actx.currentTime, 0.05); // centre the sound again
+}
+function applyEq() { // set the gains for the current mode + start/stop the 8D sweep and its room
+  if (!eqFilters) return;
+  const gains = eqGains();
+  eqFilters.forEach((f, i) => f.gain.setTargetAtTime(gains[i], actx.currentTime, 0.05));
+  if (S.eq8d) { start8d(); if (eqWet) eqWet.gain.setTargetAtTime(0.5, actx.currentTime, 0.3); } // the hall fades in with the sweep
+  else { stop8d(); if (eqWet) eqWet.gain.setTargetAtTime(0, actx.currentTime, 0.1); }
+  const b = $('#npEqBtn'); if (b) b.classList.toggle('on', S.eqMode !== 'flat' || !!S.eq8d);
+}
+function ensureAnalyser() { // wire the player through an analyser, once per element
+  if (!analyser) {
+    try {
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = actx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = .75;
+      analyser.connect(actx.destination);
+      freqData = new Uint8Array(analyser.frequencyBinCount);
+      buildEqChain();
+    } catch { return false; }
+  }
+  // both elements feed the same EQ chain (and so the same analyser), so
+  // the live waveform and the EQ keep working after a gapless swap
+  // switches the active element
+  [audioA, audioB].forEach((el) => {
+    if (!analyserWired.has(el)) { try { actx.createMediaElementSource(el).connect(eqFilters ? eqFilters[0] : analyser); analyserWired.add(el); } catch {} }
+  });
+  return true;
 }
 function drawWave() {
   const w = wave.clientWidth, h = wave.clientHeight; if (!w) return; wave.width = w; wave.height = h;
@@ -638,25 +1135,61 @@ function pushPresence() {
   return api.musicPresence({ title: t.title, artist: t.artist, album: alb ? alb.name : '', image: S.cdImage, cdSpin: S.cdUpload, artistName: S.artistName !== false, file: t.path, coverFile: (alb && alb.cover) || '', start, end: audio.duration ? start + audio.duration * 1000 : null });
 }
 
-audio.onplay = audio.onpause = () => { if (!audio.paused) { ensureAnalyser(); if (actx && actx.state === 'suspended') actx.resume(); } syncUI(); pushPresence(); };
-audio.onseeked = pushPresence;
-audio.onloadedmetadata = () => { all('.js-dur').forEach((e) => e.textContent = fmt(audio.duration)); pushPresence(); };
-audio.ontimeupdate = () => {
-  if (!seeking) { all('.js-seek').forEach((s) => s.value = audio.duration ? audio.currentTime / audio.duration * 1000 : 0); all('.js-cur').forEach((e) => e.textContent = fmt(audio.currentTime)); }
-  drawWave();
-};
-audio.onended = () => step(1, true);
+/* The same handlers on both elements. Only the ACTIVE element drives the
+   UI — the standby is only preloading, so its metadata must not overwrite
+   the current song's duration while it is still playing. (ontimeupdate
+   only fires on a playing element and onended only on the one that ended,
+   so they are naturally safe; the guard is what matters for metadata.) */
+function attachPlayerHandlers(el) {
+  el.onplay = el.onpause = () => {
+    if (el !== audio) return;
+    if (!audio.paused) { ensureAnalyser(); if (actx && actx.state === 'suspended') actx.resume(); stopThemeMusic(); } // a song started — the theme music stops
+    else maybePlayThemeMusic(); // a song paused — the theme music picks back up
+    syncUI(); pushPresence();
+  };
+  el.onseeked = () => { if (el !== audio) return; pushPresence(); updateLyricHighlight(); };
+  el.onloadedmetadata = () => { if (el !== audio) return; all('.js-dur').forEach((e) => e.textContent = fmt(audio.duration)); pushPresence(); };
+  el.ontimeupdate = () => {
+    if (el !== audio) return;
+    if (!seeking) { all('.js-seek').forEach((s) => s.value = audio.duration ? audio.currentTime / audio.duration * 1000 : 0); all('.js-cur').forEach((e) => e.textContent = fmt(audio.currentTime)); }
+    drawWave(); updateLyricHighlight();
+  };
+  el.onended = () => { if (el !== audio) return; step(1, true); };
+}
+attachPlayerHandlers(audioA); attachPlayerHandlers(audioB);
 all('.js-seek').forEach((s) => {
   s.oninput = () => { seeking = true; all('.js-seek').forEach((o) => o.value = s.value); all('.js-cur').forEach((e) => e.textContent = fmt(s.value / 1000 * (audio.duration || 0))); };
   s.onchange = () => { if (audio.duration) audio.currentTime = s.value / 1000 * audio.duration; seeking = false; };
 });
-all('.js-vol').forEach((v) => v.oninput = () => { audio.volume = v.value / 100; all('.js-vol').forEach((o) => o.value = v.value); });
+all('.js-vol').forEach((v) => v.oninput = () => { audioA.volume = audioB.volume = v.value / 100; all('.js-vol').forEach((o) => o.value = v.value); });
 all('.js-pp').forEach((b) => b.onclick = () => audio.src ? (audio.paused ? audio.play() : audio.pause()) : toast('Add some music, then pick a song!'));
 all('.js-prev').forEach((b) => b.onclick = () => step(-1));
 all('.js-next').forEach((b) => b.onclick = () => step(1));
-all('.js-shuf').forEach((b) => b.onclick = () => { shuffle = !shuffle; if (queue.length) buildOrder(order[pos]); syncUI(); toast(shuffle ? 'Shuffle on' : 'Shuffle off'); });
-all('.js-loop').forEach((b) => b.onclick = () => { loop = (loop + 1) % 3; syncUI(); toast(['Loop off', 'Looping the whole list', 'Looping this song'][loop]); });
+all('.js-shuf').forEach((b) => b.onclick = () => { shuffle = !shuffle; if (queue.length) buildOrder(order[pos]); syncUI(); prepareGapless(); toast(shuffle ? 'Shuffle on' : 'Shuffle off'); });
+all('.js-loop').forEach((b) => b.onclick = () => { loop = (loop + 1) % 3; syncUI(); prepareGapless(); toast(['Loop off', 'Looping the whole list', 'Looping this song'][loop]); });
 syncUI();
+
+/* Gumi Remote (Discord bot): the main process asks the player what is
+   playing, or tells it to pause / play / skip, and this answers back.
+   The bot talks to the main process over a localhost web address; the
+   main process forwards it here, because the player lives in this page.
+   'next' and 'previous' do exactly what the on-screen buttons do. */
+function remoteState() {
+  const t = byId(curId);
+  if (!t || !audio.src) return { playing: false, track: null };
+  const alb = lib.albums.find((a) => a.id === t.albumId);
+  return { playing: !audio.paused,
+    track: { title: t.title, artist: t.artist || '', album: alb ? alb.name : '',
+      position: Math.floor(audio.currentTime || 0), duration: audio.duration ? Math.floor(audio.duration) : null } };
+}
+api.onRemote((msg) => {
+  if (!msg) return;
+  if (msg.action === 'pause' && !audio.paused) audio.pause();
+  else if (msg.action === 'play' && audio.paused && audio.src) audio.play().catch(() => {});
+  else if (msg.action === 'next') step(1);
+  else if (msg.action === 'previous') step(-1);
+  api.remoteReply({ id: msg.id, result: remoteState() });
+});
 
 /* queue: normal, shuffled, looping */
 const shuffled = (n, first) => {
@@ -669,7 +1202,7 @@ function play(list, i, ctx, shuf) { queue = list.map((t) => t.id); ctxId = ctx; 
 function step(d, auto) {
   if (auto && loop === 2) { audio.currentTime = 0; audio.play(); return; }
   if (d < 0 && audio.currentTime > 3) { audio.currentTime = 0; return; }
-  if (d > 0 && upNext.length) { const id = upNext.shift(); renderQueue(); startTrack(byId(id)); return; }
+  if (d > 0 && upNext.length) { const id = upNext.shift(); startTrack(byId(id)); renderQueue(); return; } // start first: renderQueue re-preloads for the track after this one, and must not overwrite the preload this track is about to use
   if (!queue.length) return toast('Pick a song first!');
   let p = pos + d;
   if (p < 0 || p >= order.length) {
@@ -678,12 +1211,65 @@ function step(d, auto) {
   }
   pos = p; start(order[pos]);
 }
+/* Gapless: which track comes next, mirroring step()'s forward logic
+   without any side effects. upNext first, then the next slot in the
+   current order; loop-all wraps to the first track, loop-one replays the
+   current track (no swap needed), and the end of the list with loop off
+   is null. With shuffle on, the wrap target is the current order's first
+   track — step() reshuffles at the wrap, so if it picks a different one
+   the swap simply doesn't match and the classic path runs instead. */
+function nextTrackId() {
+  if (upNext.length) return upNext[0];
+  if (!queue.length) return null;
+  if (loop === 2) return curId;
+  const p = pos + 1;
+  if (p >= order.length) return loop === 1 ? queue[order[0]] : null;
+  return queue[order[p]];
+}
+/* Preload the next track into the standby element so it is ready to play
+   the instant the current song ends. Idempotent — if the right track is
+   already preloaded, nothing happens; if there is no next track (or the
+   next track is the one already playing, under loop-one), the standby is
+   cleared. Called whenever the next track can change. */
+/* Fully unload the standby: setting src='' alone leaves currentSrc
+   pointing at the old file, so remove the attribute and reload it. */
+function clearStandby(standby) { standby.removeAttribute('src'); standby.load(); gaplessTrack = null; }
+function prepareGapless() {
+  const standby = standbyEl();
+  if (!gaplessOn()) { clearStandby(standby); return; }
+  const id = nextTrackId();
+  if (!id || id === curId) { clearStandby(standby); return; }
+  if (id === gaplessTrack) return;
+  const t = byId(id);
+  if (!t) { clearStandby(standby); return; }
+  standby.src = fileUrl(t.path);
+  gaplessTrack = id;
+}
 async function start(qi) { startTrack(byId(queue[qi])); }
 async function startTrack(t) {
-  if (!t) return; curId = t.id;
-  audio.src = fileUrl(t.path); audio.play().catch(() => toast('Couldn’t play that file'));
+  if (!t) return; stopThemeMusic(); curId = t.id;
+  const standby = standbyEl();
+  if (gaplessOn() && t.id === gaplessTrack && standby.readyState >= 2) {
+    // true gapless: the next track is already loaded in the standby
+    // element, so just switch to it instead of loading the file again.
+    // The old element is paused first (it may still be playing if the
+    // user skipped early) so two songs never play at once; it becomes
+    // the new standby and preloads the track after this one.
+    const old = audio; audio = standby; gaplessTrack = null;
+    old.pause();
+    audio.play().catch(() => toast('Couldn’t play that file'));
+    // the standby's metadata loaded while it was inactive (its
+    // onloadedmetadata was ignored by the active-element guard), so
+    // refresh the duration display now — that event won't fire again.
+    all('.js-dur').forEach((e) => e.textContent = fmt(audio.duration)); pushPresence();
+    prepareGapless();
+  } else {
+    audio.src = fileUrl(t.path); audio.play().catch(() => toast('Couldn’t play that file'));
+    prepareGapless();
+  }
   $('#song').textContent = t.title; $('#npTitle').textContent = t.title; $('#npBy').textContent = t.artist ? 'By ' + t.artist : 'Unknown artist';
   $('#np').classList.remove('off'); layoutBigBar(); all('.js-cur').forEach((e) => e.textContent = '0:00'); renderMusic(); drawWave(); loadPeaks(t);
+  if (lyricsOpen) renderLyrics(); // the panel follows the new track; fetches only if it is open
   let c = covers.get(t.path); if (c === undefined) { c = await api.getCover(t.path); covers.set(t.path, c); }
   if (curId !== t.id) return;
   const alb = lib.albums.find((a) => a.id === t.albumId), ctx = [...lib.albums, ...lib.playlists].find((x) => x.id === ctxId);
@@ -699,6 +1285,7 @@ function renderQueue() {
   const n = upNext.length;
   $('#queueCount').textContent = n; $('#queueCount').classList.toggle('off', !n);
   renderQueueInto($('#queueList')); renderQueueInto($('#npQueue')); // mini player popup + big player panel
+  if (curId) prepareGapless(); // the queue is what plays next — keep the preload in step (skipped at boot, before any song starts)
 }
 function renderQueueInto(L) {
   if (!L) return; L.innerHTML = '';
@@ -714,6 +1301,172 @@ function renderQueueInto(L) {
 $('#queueBtn').onclick = (e) => { e.stopPropagation(); sfx('click'); $('#queuePanel').classList.toggle('open'); };
 $('#queueClear').onclick = () => { upNext = []; renderQueue(); toast('Queue cleared'); };
 $('#npQueueClear').onclick = () => { upNext = []; renderQueue(); toast('Queue cleared'); };
+
+/* lyrics: the mic button at the top-left of the big player swaps the whole
+   panel to a lyrics-only view (and back). Synced lines (from LRCLIB) light
+   up one by one as the song plays, Apple Music style — current line bright
+   and big, neighbours dimmed, kept centred; tap a synced line to jump to
+   that part of the song. Scrolling the lines yourself pauses the
+   auto-centring for a few seconds, so it never yanks you back while you
+   read — the highlight still moves, only the scrolling waits. Plain lyrics
+   say so at the top; nothing found says so too. A fetched result is cached on the track
+   (t.lyrics) and saved with persist(), so it works offline after the first
+   fetch and is never re-fetched for the same track — unless the title/artist
+   changes. */
+let lyricsOpen = false, lyricsFetching = null, curLyricIdx = -1;
+/* auto-centring pauses while the user reads: a manual scroll of the lines
+   (wheel, touch, or the scrollbar) holds the view for 5 seconds — the
+   highlight keeps moving, only the scrollIntoView is skipped. Tapping a
+   line to jump clears the pause at once. Scrolls the app makes itself
+   (centring, resetting to the top) never count as manual. */
+let lyricScrollUntil = 0, lyricProgrammaticScroll = false, lyricRefocusTimer = null;
+/* the pause / stillness window (ms): a manual scroll holds auto-centring
+   for this long, and the view glides back to the current line once the
+   cursor has sat still for the same window */
+let lyricStillMs = 5000;
+const lyricScrollPaused = () => Date.now() < lyricScrollUntil;
+const lyricPauseAutoScroll = () => { lyricScrollUntil = Date.now() + lyricStillMs; lyricScheduleRefocus(); };
+/* programmatic scrolls (centring, resetting to the top) never count as
+   manual — the flag outlasts a smooth scroll's glide (~300-500ms) so the
+   scroll events it fires mid-glide don't re-pause the view */
+const lyricAutoScrollTo = (fn) => { lyricProgrammaticScroll = true; fn(); setTimeout(() => { lyricProgrammaticScroll = false; }, 800); };
+const lyricClearRefocus = () => { if (lyricRefocusTimer !== null) { clearTimeout(lyricRefocusTimer); lyricRefocusTimer = null; } };
+function lyricScheduleRefocus() { lyricClearRefocus(); lyricRefocusTimer = setTimeout(lyricRefocus, lyricStillMs); }
+/* after 5 still seconds, glide back to the line that's playing — or to the
+   top if the song hasn't reached its first line yet */
+function lyricRefocus() {
+  lyricRefocusTimer = null;
+  if (!lyricsOpen) return;
+  const L = $('#npLyricLines'); if (!L) return;
+  if (curLyricIdx < 0) { lyricAutoScrollTo(() => { L.scrollTo({ top: 0, behavior: 'smooth' }); }); return; }
+  const on = document.querySelector('#npLyricLines .lrow.on');
+  if (on && typeof on.scrollIntoView === 'function') lyricAutoScrollTo(() => on.scrollIntoView({ block: 'center', behavior: 'smooth' }));
+}
+/* any mouse movement while the view is held restarts the stillness window —
+   the refocus only happens once the cursor has sat still for 5 seconds */
+addEventListener('mousemove', () => { if (lyricRefocusTimer !== null) lyricPauseAutoScroll(); });
+$('#npLyricLines').addEventListener('wheel', lyricPauseAutoScroll, { passive: true });
+$('#npLyricLines').addEventListener('touchmove', lyricPauseAutoScroll, { passive: true });
+$('#npLyricLines').addEventListener('scroll', () => { if (!lyricProgrammaticScroll) lyricPauseAutoScroll(); });
+const lyricKey = (t) => (t.artist || '') + '|' + (t.title || '');
+function lyricsState(t) {
+  if (!t) return 'none';
+  const c = t.lyrics;
+  if (!c || c.for !== lyricKey(t)) return 'missing';
+  if (c.none) return 'notfound';
+  if (c.synced && c.synced.length) return 'synced';
+  if (c.plain) return 'plain';
+  return 'notfound';
+}
+function renderLyrics() {
+  const t = byId(curId), L = $('#npLyricLines'), st = $('#npLyricsStatus');
+  L.innerHTML = ''; curLyricIdx = -1;
+  lyricClearRefocus(); // a new track starts fresh — no pending glide back
+  lyricAutoScrollTo(() => { L.scrollTop = 0; }); // a new track's lyrics always start at the top
+  if (!t) { st.textContent = ''; return; }
+  const state = lyricsState(t);
+  if (state === 'missing') { st.textContent = 'Finding lyrics…'; fetchLyricsFor(t); return; }
+  if (state === 'notfound') { st.textContent = 'No lyrics found for this song yet.'; return; }
+  if (state === 'plain') {
+    st.textContent = 'Lyrics aren’t synced for this song';
+    const p = document.createElement('p'); p.className = 'lyricPlain'; p.textContent = t.lyrics.plain; L.append(p); return;
+  }
+  st.textContent = '';
+  t.lyrics.synced.forEach((row, i) => {
+    const d = document.createElement('div'); d.className = 'lrow'; d.textContent = row.line;
+    d.title = 'Jump to this part of the song';
+    d.onclick = () => { lyricScrollUntil = 0; lyricClearRefocus(); audio.currentTime = row.t; }; // tap a line to jump there; onseeked/timeupdate move the highlight
+    L.append(d);
+  });
+  updateLyricHighlight(true);
+}
+async function fetchLyricsFor(t) {
+  if (!t || lyricsFetching === t.id) return;
+  if (t.lyrics && t.lyrics.for === lyricKey(t)) return; // already cached
+  lyricsFetching = t.id;
+  try {
+    const alb = lib.albums.find((a) => a.id === t.albumId);
+    const r = await api.getLyrics({ artist: t.artist || '', title: t.title || '', album: alb ? alb.name : '', duration: audio.duration || null });
+    if (lyricsFetching !== t.id) return; // the track changed while we waited
+    if (r && r.ok && r.found) t.lyrics = { for: lyricKey(t), synced: r.synced || [], plain: r.plain || null, at: Date.now() };
+    else if (r && r.ok) t.lyrics = { for: lyricKey(t), none: true, at: Date.now() };
+    else { // network/service error: don't cache it, try again next time
+      if (lyricsOpen && t.id === curId) $('#npLyricsStatus').textContent = 'Couldn’t reach the lyrics service.';
+      return;
+    }
+    persist();
+    if (lyricsOpen && t.id === curId) renderLyrics();
+  } catch {
+    if (lyricsOpen && t.id === curId) $('#npLyricsStatus').textContent = 'Couldn’t reach the lyrics service.';
+  } finally { if (lyricsFetching === t.id) lyricsFetching = null; }
+}
+function updateLyricHighlight(force) {
+  const t = byId(curId);
+  if (!lyricsOpen || !t || lyricsState(t) !== 'synced') return;
+  const now = audio.currentTime || 0, lines = t.lyrics.synced;
+  let idx = -1; for (let i = 0; i < lines.length; i++) { if (lines[i].t <= now) idx = i; else break; }
+  if (idx === curLyricIdx && !force) return;
+  curLyricIdx = idx;
+  all('#npLyricLines .lrow').forEach((el, i) => el.classList.toggle('on', i === idx));
+  if (idx === -1) { lyricAutoScrollTo(() => { const L = $('#npLyricLines'); if (L) L.scrollTop = 0; }); return; } // before the first line: back to the top
+  if (lyricScrollPaused()) return; // user is reading — move the highlight, leave the view alone
+  const on = document.querySelector('#npLyricLines .lrow.on');
+  if (on && typeof on.scrollIntoView === 'function') lyricAutoScrollTo(() => on.scrollIntoView({ block: 'center', behavior: 'smooth' })); // glide to the line, don't snap
+}
+function setLyricsOpen(open) {
+  lyricsOpen = open;
+  $('#np').classList.toggle('lyrics', open);
+  $('#npLyricsBtn').classList.toggle('on', open);
+  if (open) { if (eqOpen) setEqOpen(false); renderLyrics(); } else { curLyricIdx = -1; lyricClearRefocus(); }
+}
+$('#npLyricsBtn').onclick = () => { sfx('click'); setLyricsOpen(!lyricsOpen); };
+/* Equalizer: its own full menu, like the lyrics view — it replaces the
+   player while it is open. Five sliders you can move by hand (that
+   switches to Custom and saves the gains), or a preset if you don't
+   feel like adjusting. The EQ only takes effect once the audio engine
+   exists — that happens the first time a song plays — so applyEq() is
+   a no-op until then, and buildEqChain() applies the saved mode when
+   the engine is made. */
+function buildEqSliders() { // five vertical sliders, one per band
+  const wrap = $('#npEqSliders'); if (!wrap || wrap.children.length) return;
+  EQ_BANDS.forEach((freq, i) => {
+    const band = document.createElement('div'); band.className = 'eqBand';
+    const val = document.createElement('span'); val.className = 'eqVal'; val.textContent = '+0 dB';
+    const s = document.createElement('input'); s.type = 'range'; s.min = -12; s.max = 12; s.step = 1; s.value = 0; s.setAttribute('aria-label', EQ_LABELS[i] + ' band');
+    s.oninput = () => {
+      // Touching a slider switches to Custom — and the Custom build starts
+      // from the preset you were on, so a tweak keeps the rest of that
+      // preset instead of resetting the other bands to flat. Tapping the
+      // Custom button later brings this build back, even after switching
+      // to another preset.
+      if (S.eqMode !== 'custom') S.eqCustom = eqGains().slice();
+      if (!Array.isArray(S.eqCustom) || S.eqCustom.length !== 5) S.eqCustom = EQ_MODES.flat.slice();
+      S.eqCustom[i] = +s.value; S.eqMode = 'custom'; saveS();
+      ensureAnalyser(); applyEq(); syncEqView();
+    };
+    const f = document.createElement('span'); f.className = 'eqFreq'; f.textContent = EQ_LABELS[i];
+    band.append(val, s, f); wrap.append(band);
+  });
+}
+function syncEqView() {
+  buildEqSliders();
+  const gains = eqGains();
+  all('#npEqSliders .eqBand').forEach((band, i) => {
+    const s = band.querySelector('input'); s.value = gains[i];
+    band.querySelector('.eqVal').textContent = (gains[i] > 0 ? '+' : '') + gains[i] + ' dB';
+  });
+  all('#npEqView .eqModes button').forEach((b) => b.classList.toggle('sel', b.dataset.eq === S.eqMode));
+  $('#eq8d').checked = !!S.eq8d;
+}
+function setEqOpen(open) {
+  eqOpen = open;
+  $('#np').classList.toggle('eq', open);
+  $('#npEqBtn').classList.toggle('on', open || S.eqMode !== 'flat' || !!S.eq8d);
+  if (open) { if (lyricsOpen) setLyricsOpen(false); syncEqView(); }
+}
+$('#npEqBtn').onclick = () => { sfx('click'); setEqOpen(!eqOpen); };
+all('#npEqView .eqModes button').forEach((b) => b.onclick = () => { sfx('click'); S.eqMode = b.dataset.eq; saveS(); ensureAnalyser(); applyEq(); syncEqView(); });
+$('#eq8d').onchange = (e) => { S.eq8d = e.target.checked; saveS(); ensureAnalyser(); applyEq(); syncEqView(); };
 document.addEventListener('click', (e) => { if (!e.target.closest('#queuePanel') && !e.target.closest('#queueBtn')) $('#queuePanel').classList.remove('open'); });
 
 /* right-click a song: play next, add to queue, or add to a playlist */
@@ -749,14 +1502,98 @@ renderQueue();
 
 /* the music page */
 function card(x, kind) {
-  const c = document.createElement('div'); c.className = 'plc' + (view === (x ? x.id : null) ? ' on' : '');
+  const c = document.createElement('div'); c.className = 'plc' + (view === (x ? x.id : null) ? ' on' : ''); if (x) c.dataset.id = x.id;
   const b = document.createElement('button'); b.className = 'plb'; b.innerHTML = '<span class="pc"></span><span class="pn"></span>';
   if (x?.cover) b.firstChild.style.backgroundImage = `url("${fileUrl(x.cover)}")`; else b.firstChild.textContent = !x ? '🎵' : kind === 'album' ? '💿' : '🎶';
   b.lastChild.textContent = x ? x.name : 'All songs';
-  b.onclick = () => { sfx('click'); view = x ? x.id : null; renderMusic(); }; c.append(b);
+  b.onclick = () => { sfx('click'); if (x) openAlbumDetail(x, kind, b); else { view = null; renderMusic(); } }; c.append(b);
   if (x) { const e = document.createElement('button'); e.className = 'pe'; e.textContent = '✎'; e.title = 'Edit'; e.onclick = () => openPl(x, kind); c.append(e); }
   return c;
 }
+/* Album / playlist detail (the glide): tapping a card sends its cover
+   flying from its exact spot on the grid to a full-screen detail view
+   showing only that album's or playlist's songs; the back arrow flies
+   it home. The cover is a fixed clone animated between the two rects
+   (FLIP) — the real detail cover stays hidden until the clone lands. */
+let adOpen = null; // {kind, id} of the open detail view, or null
+function flyCover(fromRect, toRect, bg, text, done) {
+  const f = document.createElement('div'); f.id = 'adFly';
+  f.style.top = fromRect.top + 'px'; f.style.left = fromRect.left + 'px';
+  f.style.width = fromRect.width + 'px'; f.style.height = fromRect.height + 'px';
+  if (bg) f.style.backgroundImage = bg; else f.textContent = text;
+  document.body.append(f);
+  void f.offsetWidth; // force a reflow so the transition starts from fromRect
+  f.style.top = toRect.top + 'px'; f.style.left = toRect.left + 'px';
+  f.style.width = toRect.width + 'px'; f.style.height = toRect.height + 'px';
+  f.style.borderRadius = '16px'; f.style.fontSize = '64px';
+  f.addEventListener('transitionend', () => { f.remove(); done && done(); }, { once: true });
+}
+function renderDetailList() { // the open detail's songs, same rows as the main list
+  const L = $('#adSongs'); L.innerHTML = '';
+  if (!curList.length) { const m = document.createElement('p'); m.className = 'muted'; m.textContent = 'Nothing in here yet.'; L.appendChild(m); return; }
+  curList.forEach((t, i) => {
+    const r = document.createElement('div'); r.className = 'song' + (t.id === curId ? ' now' : '');
+    const b = document.createElement('button'); b.className = 'sb'; b.innerHTML = '<span class="sn"></span><span class="sa"></span>';
+    b.firstChild.textContent = t.title; b.lastChild.textContent = t.artist || ''; b.onclick = () => { sfx('click'); play(curList, i, view); moveThemeCursor(() => document.querySelector('.song.now'), 'left'); }; r.append(b);
+    // the playing song is highlighted by the .now class above; the + button
+    // queues this song into Up next without leaving the album
+    const q = document.createElement('button'); q.className = 'sq'; q.textContent = '＋'; q.title = 'Add to queue';
+    q.onclick = (e) => { e.stopPropagation(); upNext.push(t.id); renderQueue(); toast('Added to queue: ' + t.title); };
+    r.append(q);
+    L.appendChild(r);
+  });
+}
+/* The album switcher: every album + playlist stays in a strip at the top
+   of the detail, so you can jump to another one without backing out.
+   Switching is instant (no glide) — the glide is only for opening from
+   the grid. renderMusic() re-renders the song list for the new album. */
+function renderAdSwitch() {
+  const S = $('#adSwitch'); S.innerHTML = '';
+  const items = [...lib.albums.map((a) => [a, 'album']), ...lib.playlists.map((p) => [p, 'playlist'])];
+  items.forEach(([x, kind]) => {
+    const b = document.createElement('button'); b.className = 'adSw' + (adOpen && adOpen.id === x.id ? ' on' : '');
+    if (x.cover) b.style.backgroundImage = `url("${fileUrl(x.cover)}")`; else b.textContent = kind === 'album' ? '💿' : '🎶';
+    b.title = x.name;
+    b.onclick = () => { if (adOpen && adOpen.id === x.id) return; sfx('click'); switchAlbumDetail(x, kind); };
+    S.append(b);
+  });
+}
+function fillAlbumDetail(x, kind) { // title, cover, and the switcher strip for an album/playlist
+  $('#adTitle').textContent = x.name;
+  $('#adSub').textContent = (kind === 'album' ? 'Album' : 'Playlist') + ' · ' + curList.length + (curList.length === 1 ? ' song' : ' songs');
+  const cover = $('#adCover');
+  cover.style.backgroundImage = x.cover ? `url("${fileUrl(x.cover)}")` : ''; cover.textContent = x.cover ? '' : (kind === 'album' ? '💿' : '🎶');
+  renderAdSwitch();
+}
+function switchAlbumDetail(x, kind) {
+  view = x.id; adOpen = { kind, id: x.id }; renderMusic();
+  fillAlbumDetail(x, kind);
+}
+function openAlbumDetail(x, kind, cardBtn) {
+  const pc = cardBtn.querySelector('.pc');
+  const fromRect = pc.getBoundingClientRect();
+  const bg = pc.style.backgroundImage, text = pc.textContent;
+  view = x.id; adOpen = { kind, id: x.id }; renderMusic();
+  fillAlbumDetail(x, kind);
+  $('#albumDetail').classList.remove('off');
+  const cover = $('#adCover');
+  cover.style.visibility = 'hidden';
+  flyCover(fromRect, cover.getBoundingClientRect(), bg, text, () => { cover.style.visibility = ''; });
+}
+function closeAlbumDetail() {
+  if (!adOpen) return;
+  const cover = $('#adCover');
+  const fromRect = cover.getBoundingClientRect();
+  const bg = cover.style.backgroundImage, text = cover.textContent;
+  // measure the card's spot BEFORE renderMusic() recreates the grid
+  const pc = document.querySelector(`.plc[data-id="${adOpen.id}"] .pc`);
+  const toRect = pc ? pc.getBoundingClientRect() : fromRect;
+  cover.style.visibility = 'hidden';
+  const id = adOpen.id;
+  flyCover(fromRect, toRect, bg, text, () => { $('#albumDetail').classList.add('off'); cover.style.visibility = ''; });
+  view = null; adOpen = null; renderMusic();
+}
+$('#adBack').onclick = () => { sfx('click'); closeAlbumDetail(); };
 function renderMusic() {
   $('#albums').replaceChildren(card(null), ...lib.albums.map((a) => card(a, 'album')));
   $('#pls').replaceChildren(...lib.playlists.map((p) => card(p, 'playlist'))); $('#plHead').classList.toggle('off', !lib.playlists.length);
@@ -767,10 +1604,16 @@ function renderMusic() {
   curList.forEach((t, i) => {
     const r = document.createElement('div'); r.className = 'song' + (t.id === curId ? ' now' : '');
     const b = document.createElement('button'); b.className = 'sb'; b.innerHTML = '<span class="sn"></span><span class="sa"></span>';
-    b.firstChild.textContent = t.title; b.lastChild.textContent = t.artist || ''; b.onclick = () => { sfx('click'); play(curList, i, view); }; r.append(b);
+    b.firstChild.textContent = t.title; b.lastChild.textContent = t.artist || ''; b.onclick = () => { sfx('click'); play(curList, i, view); moveThemeCursor(() => document.querySelector('.song.now'), 'left'); }; r.append(b);
     if (!x) { const e = document.createElement('button'); e.className = 'sx'; e.textContent = '✕'; e.title = 'Remove from library'; e.onclick = () => removeTrack(t.id); r.append(e); }
     L.appendChild(r);
   });
+  // the detail view follows the same list: if the album/playlist it
+  // shows is gone (deleted while open), close it; otherwise keep its
+  // songs in step with the main list (e.g. the now-playing highlight).
+  if (adOpen && view !== adOpen.id) { $('#albumDetail').classList.add('off'); adOpen = null; }
+  else if (adOpen) renderDetailList();
+  positionThemeCursor();
 }
 $('#playAll').onclick = () => curList.length ? play(curList, 0, view) : toast('Nothing to play yet');
 $('#shufAll').onclick = () => curList.length ? play(curList, Math.floor(Math.random() * curList.length), view, true) : toast('Nothing to play yet');
@@ -821,7 +1664,7 @@ $('#pform').onsubmit = (e) => {
   view = curPl.id; persist(); sfx('click'); closePl(); renderMusic();
 };
 /* settings */
-const S = Object.assign({ scan: true, musicRpc: true, cdImage: 'cd', cdUpload: false, theme: 'neutral', pics: [], dim: 55,
+const S = Object.assign({ scan: true, musicRpc: true, gapless: true, cdImage: 'cd', cdUpload: false, cdInApp: true, cdHole: true, devMode: false, eqMode: 'flat', eqCustom: [0, 0, 0, 0, 0], eq8d: false, theme: 'neutral', pics: [], dim: 55,
   neon: false, fontFile: '', fontSize: 16, iconColor: '', colors: {}, customThemes: [], activeTheme: '', artistName: true, miniPos: null },
   JSON.parse(localStorage.getItem('gumi-settings') || '{}'));
 delete S.colors; // colours now come from the theme only — old per-part picks are dropped so they can't contradict the theme
@@ -832,7 +1675,22 @@ S.customThemes = S.customThemes || [];
 S.sounds = S.sounds || {}; delete S.sounds.blip;
 ['click', 'launch'].forEach((n) => { const s = S.sounds[n] || {}; S.sounds[n] = { file: typeof s.file === 'string' ? s.file : '', vol: typeof s.vol === 'number' ? s.vol : (S.sfx === false ? 0 : 60) }; });
 const saveS = () => localStorage.setItem('gumi-settings', JSON.stringify(S));
+// Frutiger Aero — the welcome package: the first theme package. It bundles
+// a wallpaper, a sidebar picture, picture icons, a mascot, a click sound
+// and startup music, with bubble-glass boxes. Added once, never forced on:
+// existing installs keep whatever theme they already have.
+const AERO_THEME = { id: 'frutiger-aero', name: 'Frutiger Aero', image: 'assets/themes/frutiger-aero/wallpaper.png', accent: '#4674a1', palette: { accent: '#4674a1', bg: '#111c27', bg2: '#29333d', panel: '#3c454e', text: '#e8eaf8', muted: '#9298a4', line: '#404955', cyan: '#78b59e', pink: '#ff4fa3', green: '#59a623' }, autoAccent: true, fit: 'cover', pos: 'center', zoom: 100, ratio: '16:9', sidebarPic: 'assets/themes/frutiger-aero/sidebar.jpg', icons: { games: 'assets/themes/frutiger-aero/gamepad.png', music: 'assets/themes/frutiger-aero/music-note.png' }, mascot: 'assets/themes/frutiger-aero/mascot.png', click: 'assets/themes/frutiger-aero/click.mp3', themeMusic: 'assets/themes/frutiger-aero/LEASE - Takeshi Abo.mp3', themeMusicOn: true, bubble: true };
+const _aeroSaved = S.customThemes.find((t) => t.id === 'frutiger-aero');
+if (!_aeroSaved) { S.customThemes.push(AERO_THEME); saveS(); }
+// the Aero theme music was renamed (theme.mp3 -> LEASE - Takeshi Abo.mp3):
+// a saved Aero theme from before the rename still points at the old file,
+// which no longer exists, so the music silently never plays. Migrate it.
+else if (_aeroSaved.themeMusic === 'assets/themes/frutiger-aero/theme.mp3') { _aeroSaved.themeMusic = AERO_THEME.themeMusic; saveS(); }
+// Sonic Colors used to ship built in. It is Brandon's own theme now —
+// it travels as sonic-colors.gumipack and installs through Import, so it
+// is not in the app for everyone by default.
 let picI = 0, picT = null;
+let introT = null, lastThemeId = null; // wallpaper-intro timer + the theme it played for
 const hexRgb = (h) => { const n = parseInt(String(h || '#8b4dff').slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(','); };
 const shade = (h, p) => { const [r, g, b] = hexRgb(h).split(',').map(Number); const t = p < 0 ? 0 : 255, a = Math.abs(p) / 100;
   return '#' + [r, g, b].map((v) => Math.round((t - v) * a + v).toString(16).padStart(2, '0')).join(''); };
@@ -840,28 +1698,259 @@ const shade = (h, p) => { const [r, g, b] = hexRgb(h).split(',').map(Number); co
    A custom theme's palette (taken from its picture) sets every colour —
    there are no per-part overrides any more, so the theme can't contradict
    itself and the text stays readable. */
-const themeDefaults = { bg: '#0a0b18', bg2: '#10132b', panel: '#141830', text: '#e8eaf8', muted: '#8c93b8', line: '#2d3560', purple: '#8b4dff', cyan: '#3be8ff', pink: '#ff4fa3', green: '#39e08a' };
+const themeDefaults = { bg: '#0a0b18', bg2: '#10132b', panel: '#141830', text: '#e8eaf8', muted: '#8c93b8', line: '#2d3560', purple: '#8b4dff', cyan: '#3be8ff', pink: '#ff4fa3', green: '#39e08a', btn: '#1c2243', itemfill: '#4a2f9a', glow: '#1d1650' };
 let themePalette = null; // the active custom theme's palette from its picture, or null for built-in themes
+/* The mascot: Gumi by default, or the active theme package's mascot.
+   Re-rendered whenever the theme changes, so switching themes swaps the
+   mascot everywhere it appears — title bar, Ask Gumi button, the tour
+   sprite and the profile avatar (when not signed in to Discord). */
+function gumiArt() { const t = activeTheme(); return t?.mascot ? `<img src="${fileUrl(t.mascot)}" alt="">` : GUMI; }
+function renderGumi() {
+  document.querySelectorAll('[data-gumi]').forEach((e) => e.innerHTML = gumiArt());
+  $('#sprite').innerHTML = gumiArt();
+  if (!me?.avatar) $('#me .av').innerHTML = gumiArt();
+}
+/* Sidebar picture icons from a theme package: the Games / Music buttons
+   show the package's pictures as real images instead of the recoloured
+   silhouettes. The Settings icon always stays the default silhouette. */
+function applyNavIcons(t) {
+  const set = (v, pic) => { const el = document.querySelector(`.nav[data-v="${v}"] .ni`); if (!el) return;
+    if (pic) { el.classList.remove('sil'); el.classList.add('pic'); el.style.setProperty('--pic', `url("${fileUrl(pic)}")`); }
+    else { el.classList.add('sil'); el.classList.remove('pic'); el.style.removeProperty('--pic'); } };
+  set('games', t?.icons?.games); set('music', t?.icons?.music);
+}
+/* Theme music: a theme package can bring a song that plays when the app
+   opens with that theme. It loops with fades — the last 3 seconds fade
+   out, then after 3 seconds of silence it starts again, fading in over
+   2 seconds. It stops as soon as a real song starts (and picks back up
+   when one is paused), when the theme is switched, or when its toggle is
+   turned off. The fade pump and the replay timer are owned here and
+   always cancelled by stopThemeMusic(), so a song starting mid-fade or
+   mid-gap can never restart the theme music afterwards. */
+const THEME_MUSIC_VOL = 0.5;
+let themeAudio = null, themeFadeTimer = null, themeReplayTimer = null, themeMusicIdx = 0;
+let themeMusicOrder = null, themeMusicLastIdx = -1; // shuffle: the play order (indices into the list) + the track that just played, so a fresh round never starts with the same song twice in a row
+// a theme can shuffle its list instead of playing it in order
+// (themeMusicShuffle in the manifest). Fisher-Yates over the indices.
+function shuffleThemeMusicOrder(n) {
+  const order = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  if (n > 1 && themeMusicLastIdx >= 0 && order[0] === themeMusicLastIdx) { const k = 1 + Math.floor(Math.random() * (n - 1)); [order[0], order[k]] = [order[k], order[0]]; }
+  themeMusicOrder = order;
+}
+// the name shown for a theme track: the file name without its folder or
+// extension, underscores turned back into spaces.
+function themeTrackName(p) {
+  const base = String(p || '').split(/[\\/]/).pop().replace(/\.[^.]+$/, '');
+  return (base.replace(/_+/g, ' ').replace(/\s+/g, ' ').trim()) || 'Theme music';
+}
+// a theme's startup music is a list of tracks that rotate: a single-file
+// theme (themeMusic) is just a list of one. The index only advances when
+// a track ends on its own — pausing a song resumes the same track.
+function themeMusicList(t) {
+  if (Array.isArray(t?.themeMusicList) && t.themeMusicList.length) return t.themeMusicList;
+  if (t?.themeMusic) return [t.themeMusic];
+  return [];
+}
+function stopThemeMusic() {
+  if (themeFadeTimer) { clearInterval(themeFadeTimer); themeFadeTimer = null; }
+  if (themeReplayTimer) { clearTimeout(themeReplayTimer); themeReplayTimer = null; }
+  if (themeAudio) { try { themeAudio.pause(); themeAudio.currentTime = 0; } catch {} themeAudio = null; }
+  const now = $('#themeMusicNow'); if (now) now.style.display = 'none';
+}
+function themeMusicVolume(a) { // 0 -> 0.5: 2s fade-in, 3s fade-out at the end
+  const d = a.duration;
+  if (!d || isNaN(d) || d <= 0) return 0; // not loaded yet — stay silent until we know the length
+  const fadeIn = Math.min(1, (a.currentTime || 0) / 2);
+  const fadeOut = Math.max(0, Math.min(1, (d - (a.currentTime || 0)) / 3));
+  return THEME_MUSIC_VOL * fadeIn * fadeOut;
+}
+function startThemeFadePump() {
+  if (themeFadeTimer) clearInterval(themeFadeTimer);
+  themeFadeTimer = setInterval(() => {
+    if (!themeAudio) { clearInterval(themeFadeTimer); themeFadeTimer = null; return; }
+    const d = themeAudio.duration;
+    if (d && !isNaN(d) && themeAudio.currentTime >= d) { // track ended: move to the next one, 3s of silence, then play it
+      clearInterval(themeFadeTimer); themeFadeTimer = null;
+      themeMusicIdx++;
+      themeReplayTimer = setTimeout(() => { themeReplayTimer = null; maybePlayThemeMusic(); }, 3000);
+      return;
+    }
+    themeAudio.volume = themeMusicVolume(themeAudio);
+  }, 100);
+}
+function maybePlayThemeMusic() {
+  stopThemeMusic();
+  const t = activeTheme();
+  const list = themeMusicList(t);
+  if (!list.length || t.themeMusicOn === false) return;
+  if (audio.src && !audio.paused) return; // a user song is playing — never play over it
+  // shuffle: play the list in a shuffled order (a fresh shuffle each time
+  // the list runs out), never the same song twice in a row across rounds.
+  // Otherwise the list plays in order, like before.
+  const shuffle = !!t.themeMusicShuffle && list.length > 1;
+  if (shuffle) {
+    if (!themeMusicOrder || themeMusicIdx >= list.length) { shuffleThemeMusicOrder(list.length); themeMusicIdx = 0; }
+  } else themeMusicOrder = null;
+  const i = shuffle ? themeMusicOrder[themeMusicIdx] : themeMusicIdx % list.length;
+  themeMusicLastIdx = i;
+  themeAudio = new Audio(fileUrl(list[i])); themeAudio.volume = 0;
+  themeAudio.play().catch(() => { themeAudio = null; });
+  startThemeFadePump();
+  const now = $('#themeMusicNow'); if (now) { now.textContent = '♪ ' + themeTrackName(list[i]); now.style.display = 'flex'; }
+}
+function themeSwitched() { stopThemeMusic(); themeMusicIdx = 0; themeMusicOrder = null; themeMusicLastIdx = -1; maybePlayThemeMusic(); } // theme changed: the old music stops, the new theme's starts from its first track (or a fresh shuffle, if it shuffles)
+// Footer theme-music toggle, next to Ask Gumi. It only appears while the
+// active theme has theme music — on it glows, off it goes dim with a slash
+// through the note. Never use class `off` for the off state: the app
+// already uses `.off` to hide buttons, so `is-off` is the safe name.
+const TM_NOTE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>';
+const TM_NOTE_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/><line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+function renderThemeMusicToggle() {
+  const btn = $('#themeMusicToggle'); if (!btn) return;
+  const ct = activeTheme();
+  const hasMusic = !!ct && themeMusicList(ct).length > 0;
+  btn.style.display = hasMusic ? 'flex' : 'none';
+  if (!hasMusic) return;
+  const on = ct.themeMusicOn !== false;
+  btn.classList.toggle('on', on);
+  btn.classList.toggle('is-off', !on);
+  btn.innerHTML = (on ? TM_NOTE : TM_NOTE_OFF) + '<span class="tmlabel">Theme music</span>';
+}
+$('#themeMusicToggle').onclick = (e) => {
+  e.stopPropagation(); sfx('click');
+  const ct = activeTheme(); if (!ct || !themeMusicList(ct).length) return;
+  ct.themeMusicOn = !(ct.themeMusicOn !== false);
+  saveS();
+  if (ct.themeMusicOn) maybePlayThemeMusic(); else stopThemeMusic();
+  renderThemeMusicToggle();
+  themeUI(); // keeps the editor's Theme music checkbox in sync
+};
+// Theme cursor: a little glowing ball beside the current selection that
+// glides to the next one (the Kingdom Hearts menu cursor). A theme carries
+// it as a colour — cursor:'#ff9d00' — and without one the ball stays
+// hidden. It follows the sidebar nav, the picked game and the playing
+// song. The finder remembers what it is tracking, so scrolling or a list
+// rebuild can keep it in place.
+let cursorFinder = null, cursorSide = 'left';
+function positionThemeCursor() {
+  const ball = $('#themeCursor'); if (!ball) return;
+  const ct = activeTheme();
+  if (!ct?.cursor || !cursorFinder) { ball.style.display = 'none'; return; }
+  const el = cursorFinder();
+  if (!el) { ball.style.display = 'none'; return; }
+  const r = el.getBoundingClientRect();
+  // the target scrolled out of sight: fade the ball out until it comes back
+  if (r.bottom < 0 || r.top > innerHeight || !r.width) { ball.style.opacity = '0'; return; }
+  ball.style.opacity = '1'; ball.style.display = 'block';
+  // nav buttons sit at the screen's left edge, so the ball goes to their
+  // right; games and songs get it hovering just left of the item, like the
+  // menu. The caller picks the side — a position guess would misfire on
+  // the game shelf, which starts barely past the rail.
+  ball.style.left = (cursorSide === 'right' ? r.right + 6 : r.left - 26) + 'px';
+  ball.style.top = (r.top + r.height / 2 - 9) + 'px';
+}
+function moveThemeCursor(finder, side) { if (finder) cursorFinder = finder; if (side) cursorSide = side; positionThemeCursor(); }
+// scrolling moves the target under the fixed ball — re-place it (rAF so a
+// fast scroll doesn't re-place on every event)
+let cursorRaf = null;
+document.addEventListener('scroll', () => { if (cursorRaf) return; cursorRaf = requestAnimationFrame(() => { cursorRaf = null; positionThemeCursor(); }); }, true);
+// a window resize moves every target under the fixed ball — same re-place
+addEventListener('resize', () => { if (cursorRaf) return; cursorRaf = requestAnimationFrame(() => { cursorRaf = null; positionThemeCursor(); }); });
 function applyTheme() {
   document.body.dataset.theme = S.theme; clearInterval(picT); const bg = $('#bgpics');
   $('#bgdim').style.setProperty('--dim', S.dim / 100);
-  const ct = S.theme === 'custom' ? S.customThemes.find((t) => t.id === S.activeTheme) : null;
+  const ct = activeTheme();
   if (ct) {
+    document.body.dataset.themeid = ct.id;
     const acc = ct.accent || '#8b4dff';
     themePalette = ct.palette ? { ...ct.palette, accent: acc } : null;
     document.body.style.setProperty('--purple', acc); document.body.style.setProperty('--pr', hexRgb(acc));
     document.body.style.setProperty('--grad', `linear-gradient(180deg, ${shade(acc, 25)}, ${shade(acc, -25)})`);
     document.body.style.setProperty('--hi', shade(acc, 45));
-    if (themePalette) ['bg', 'bg2', 'panel', 'text', 'muted', 'line', 'cyan', 'pink', 'green'].forEach((k) => document.body.style.setProperty('--' + k, themePalette[k]));
+    if (themePalette) {
+      // palettes saved before btn/itemfill/glow existed (e.g. the baked
+      // Frutiger Aero one): derive them from the palette and keep them
+      if (!themePalette.btn || !themePalette.itemfill || !themePalette.glow) {
+        const extra = deriveExtra(themePalette);
+        ct.palette = { ...ct.palette, ...extra }; saveS();
+        themePalette = { ...themePalette, ...extra };
+      }
+      ['bg', 'bg2', 'panel', 'text', 'muted', 'line', 'cyan', 'pink', 'green', 'btn', 'itemfill', 'glow'].forEach((k) => document.body.style.setProperty('--' + k, themePalette[k]));
+    }
     else paletteFromImage(ct.image).then((pal) => { ct.palette = pal; saveS(); applyS(); }); // theme from before palettes existed: take its colours once, then apply them
     bg.style.backgroundImage = `url("${fileUrl(ct.image)}")`;
     bg.style.backgroundSize = ct.fit === 'contain' ? 'contain' : ct.fit === 'fill' ? '100% 100%' : (ct.zoom && ct.zoom !== 100 ? ct.zoom + '%' : 'cover');
     bg.style.backgroundPosition = ct.pos || 'center'; bg.style.backgroundRepeat = 'no-repeat'; bg.style.opacity = 1;
+    // wallpaper intro: a theme can bring a short splash (Persona 3's white
+    // flash + plunge) that plays once when the app opens or the theme
+    // begins, then hands over to the looping wallpaper. It only plays when
+    // the theme itself changes — switching settings while the theme is
+    // already on does not replay it.
+    clearTimeout(introT);
+    if (ct.wallpaperIntro && ct.id !== lastThemeId) {
+      // The intro plays once and holds its last frame (which IS the
+      // loop's first frame), so the handoff is seamless even if the
+      // swap is a hair late. Both GIFs are preloaded first: the loop
+      // is 10MB, and its first frame used to decode on the swap, which
+      // made the handoff visibly skip; and the timer only starts once
+      // the intro itself is loaded, so it lines up with the intro's
+      // actual playback instead of the decode delay.
+      const loopImg = new Image(); loopImg.src = fileUrl(ct.image);
+      const introImg = new Image(); introImg.src = fileUrl(ct.wallpaperIntro);
+      const startIntro = () => {
+        bg.style.backgroundImage = `url("${fileUrl(ct.wallpaperIntro)}")`;
+        introT = setTimeout(() => { bg.style.backgroundImage = `url("${fileUrl(ct.image)}")`; }, ct.wallpaperIntroMs || 3000);
+      };
+      if (introImg.complete) startIntro();
+      else { introImg.onload = startIntro; introImg.onerror = startIntro; }
+    }
+    lastThemeId = ct.id;
+    // theme package extras: sidebar picture, picture icons, mascot, bubble glass / HUD boxes
+    const rail = $('#rail');
+    if (ct.sidebarPic) { rail.style.backgroundImage = `url("${fileUrl(ct.sidebarPic)}")`; rail.style.backgroundSize = ct.sidebarFit || 'cover'; rail.style.backgroundPosition = 'center'; rail.style.backgroundRepeat = 'no-repeat'; }
+    else { rail.style.backgroundImage = ''; rail.style.backgroundSize = ''; rail.style.backgroundPosition = ''; rail.style.backgroundRepeat = ''; }
+    applyNavIcons(ct);
+    document.body.classList.toggle('bubble', !!ct.bubble);
+    document.body.classList.toggle('hud', !!ct.hud);
+    document.body.classList.toggle('menu', !!ct.menu);
+    if (ct.cursor) document.body.style.setProperty('--cursor', ct.cursor); else document.body.style.removeProperty('--cursor');
+    // theme package font: a theme can bring its own display font (Sonic
+    // Colors' rounded chunky one). It applies to headings, buttons and rows
+    // while the theme is on — the small descriptions keep the normal font —
+    // and goes away with the theme.
+    let tf = $('#themeFontStyle');
+    if (ct.font) {
+      if (!tf) { tf = document.createElement('style'); tf.id = 'themeFontStyle'; document.head.appendChild(tf); }
+      tf.textContent = `@font-face { font-family:'GumiThemeFont'; src:url("${fileUrl(ct.font)}"); font-display:swap; } body.theme-font h1, body.theme-font h2, body.theme-font h3, body.theme-font #head, body.theme-font .shead, body.theme-font .tname, body.theme-font .item, body.theme-font button, body.theme-font .song .sb, body.theme-font .plc .plb, body.theme-font .theme-card, body.theme-font #mini, body.theme-font #np { font-family:'GumiThemeFont','Trebuchet MS',sans-serif; }`;
+      document.body.classList.add('theme-font');
+    } else { if (tf) tf.remove(); document.body.classList.remove('theme-font'); }
+    // theme package CSS: a theme can bring its own stylesheet that rebuilds
+    // the whole interface (Sonic Colors' full menu look). It loads only
+    // while the theme is on and goes away with it, like the theme font.
+    let tc = $('#themeCssLink');
+    if (ct.css) {
+      if (!tc) { tc = document.createElement('link'); tc.id = 'themeCssLink'; tc.rel = 'stylesheet'; document.head.appendChild(tc); }
+      tc.href = fileUrl(ct.css);
+    } else if (tc) tc.remove();
+    // the selection bar rides the active nav button; its size can change
+    // when a theme stylesheet lands, so re-park it once the sheet is in
+    // (and once more shortly after, in case the sheet was already cached)
+    if (tc) tc.onload = positionSelBar;
+    setTimeout(positionSelBar, 120);
+    renderThemeMusicToggle();
+    positionThemeCursor();
+    renderGumi();
     return;
   }
   themePalette = null;
+  lastThemeId = null; clearTimeout(introT);
   // a custom theme's palette was set inline — clear it so the built-in theme's own colours show
-  ['--purple', '--pr', '--grad', '--hi', '--bg', '--bg2', '--panel', '--text', '--muted', '--line', '--cyan', '--pink', '--green'].forEach((v) => document.body.style.removeProperty(v));
+  ['--purple', '--pr', '--grad', '--hi', '--bg', '--bg2', '--panel', '--text', '--muted', '--line', '--cyan', '--pink', '--green', '--btn', '--itemfill', '--glow'].forEach((v) => document.body.style.removeProperty(v));
+  // no theme package active: sidebar picture, picture icons, mascot and
+  // bubble glass / HUD boxes all go back to the defaults, and any theme music stops
+  const rail = $('#rail'); rail.style.backgroundImage = ''; rail.style.backgroundSize = ''; rail.style.backgroundPosition = ''; rail.style.backgroundRepeat = '';
+  applyNavIcons(null); document.body.classList.remove('bubble'); document.body.classList.remove('hud'); document.body.classList.remove('menu'); document.body.style.removeProperty('--cursor'); const tf = $('#themeFontStyle'); if (tf) tf.remove(); document.body.classList.remove('theme-font'); const tc = $('#themeCssLink'); if (tc) tc.remove(); document.body.removeAttribute('data-themeid'); renderGumi(); stopThemeMusic(); renderThemeMusicToggle(); positionThemeCursor();
   const pics = S.theme === 'custom' ? S.pics : [];
   if (!pics.length) { bg.style.backgroundImage = ''; bg.style.backgroundSize = ''; bg.style.backgroundPosition = ''; return; }
   bg.style.backgroundSize = 'cover'; bg.style.backgroundPosition = 'center';
@@ -880,7 +1969,7 @@ function applyFont() {
   const fv = $('#fontSizeVal'); if (fv) fv.textContent = String(S.fontSize || 16);
 }
 function applyIconColor() { document.body.style.setProperty('--iconColor', S.iconColor || ''); }
-const applyS = () => { document.body.classList.toggle('noscan', !S.scan); document.body.classList.toggle('neon', !!S.neon); applyTheme(); applyFont(); applyIconColor(); };
+const applyS = () => { document.body.classList.toggle('noscan', !S.scan); document.body.classList.toggle('neon', !!S.neon); document.body.classList.toggle('cd-cover', S.cdInApp === false); document.body.classList.toggle('cd-nohole', S.cdHole === false); applyTheme(); applyFont(); applyIconColor(); };
 $('#s-scan').checked = S.scan; applyS();
 $('#s-scan').onchange = (e) => { S.scan = e.target.checked; saveS(); applyS(); };
 api.getStartup().then((v) => { $('#s-start').checked = v; });
@@ -892,11 +1981,28 @@ $('#s-appid').onchange = async (e) => {
   toast('Application ID saved'); api.restore().then((p) => { me = p; showMe(); }); pushPresence();
 };
 $('#s-log').onclick = () => api.openLog();
-$('#s-update').onclick = async () => { $('#updateStatus').textContent = 'Checking…'; const r = await api.checkUpdates(); if (!r || !r.ok) { $('#updateStatus').textContent = ''; return toast((r && r.error) || 'Couldn’t check for updates'); } $('#updateStatus').textContent = r.update ? 'Update found — downloading…' : 'You’re on the latest version'; };
+$('#s-update').onclick = async () => { $('#updateStatus').textContent = 'Checking…'; const r = await api.checkUpdates(); if (!r || !r.ok) { $('#updateStatus').textContent = ''; return toast((r && r.error) || 'Couldn’t check for updates'); } $('#updateStatus').textContent = r.update ? 'Update found, downloading…' : 'You’re on the latest version'; };
 $('#s-restart').onclick = () => api.restartUpdate();
 $('#s-cdup').checked = S.cdUpload; $('#s-cdup').onchange = (e) => { S.cdUpload = e.target.checked; saveS(); pushPresence(); };
+$('#s-cdinapp').checked = S.cdInApp !== false; $('#s-cdinapp').onchange = (e) => { S.cdInApp = e.target.checked; saveS(); applyS(); syncCdHoleRow(); };
+// CD hole: only offered while "CD in the app" is on, since the hole only exists on the spinning CD
+function syncCdHoleRow() { const row = $('#cdHoleRow'); if (row) row.style.display = S.cdInApp === false ? 'none' : ''; }
+$('#s-cdhole').checked = S.cdHole !== false; $('#s-cdhole').onchange = (e) => { S.cdHole = e.target.checked; saveS(); applyS(); };
+syncCdHoleRow();
+/* Developer / Showcasing mode: swap the real library for the sample one
+   (and back). Stops whatever is playing first, since the track list is
+   about to change, and shows the DEMO badge in the title bar. */
+async function applyDevMode() {
+  try { audioA.pause(); audioB.pause(); } catch {}
+  curId = null;
+  document.querySelector('#demoBadge').style.display = S.devMode ? '' : 'none';
+  await refresh(); await loadMusic(); syncUI();
+}
+$('#s-devmode').checked = S.devMode === true;
+$('#s-devmode').onchange = async (e) => { S.devMode = e.target.checked; saveS(); await applyDevMode(); toast(S.devMode ? 'Showcasing mode on. Sample library, nothing is saved' : 'Showcasing mode off. Your real library is back'); };
 $('#s-cd').value = S.cdImage; $('#s-cd').onchange = (e) => { S.cdImage = e.target.value.trim(); saveS(); pushPresence(); };
 $('#s-music').checked = S.musicRpc; $('#s-music').onchange = (e) => { S.musicRpc = e.target.checked; saveS(); pushPresence(); };
+$('#s-gapless').checked = S.gapless !== false; $('#s-gapless').onchange = (e) => { S.gapless = e.target.checked; saveS(); prepareGapless(); };
 $('#s-artist').checked = S.artistName !== false; $('#s-artist').onchange = (e) => { S.artistName = e.target.checked; saveS(); pushPresence(); };
 /* Pick a full interface palette from a picture: the accent is the most
    vibrant colour in it, the background is its darkest tone (darkened
@@ -909,6 +2015,29 @@ $('#s-artist').checked = S.artistName !== false; $('#s-artist').onchange = (e) =
    pixels wins the accent. Grey, near-black and near-white pixels are
    skipped for the accent so a dark photo doesn't end up with a grey
    accent. Falls back to the default palette if the picture can't be read. */
+/* The three colours the palette needs beyond the picture's main groups:
+   the button base, the sidebar hover-fill sweep, and the background
+   glow wash. They come from the palette itself so every button follows
+   the theme: btn is the panel lightened a touch (darkened for light
+   themes), the fill is the accent shaded toward its dark end (lighter
+   for light themes), and the glow is the accent shaded almost all the
+   way there. btn is checked against the text colour like the other
+   surfaces, and the fill against the white hover text. */
+function deriveExtra(pal) {
+  const hex = (r, g, b) => '#' + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+  const lum = (h) => { const [r, g, b] = hexRgb(h).split(',').map(Number); const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b); };
+  const contrast = (a, b) => { const l1 = lum(a), l2 = lum(b); return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05); };
+  const mix = (a, b, t) => { const [r1, g1, b1] = hexRgb(a).split(',').map(Number), [r2, g2, b2] = hexRgb(b).split(',').map(Number); return hex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t); };
+  const text = pal.text || '#e8eaf8', acc = pal.accent || '#8b4dff';
+  const lightText = lum(text) > 0.5; // light text on dark surfaces, or the other way round
+  let btn = shade(pal.panel || '#141830', lightText ? 12 : -8);
+  const btnTarget = lightText ? '#000000' : '#ffffff';
+  let guard = 0; while (contrast(btn, text) < 3.5 && guard++ < 12) btn = mix(btn, btnTarget, 0.25);
+  let itemfill = shade(acc, lightText ? -35 : 45);
+  guard = 0; while (contrast(itemfill, '#ffffff') < 3 && guard++ < 8) itemfill = mix(itemfill, '#000000', 0.2);
+  const glow = shade(acc, lightText ? -70 : 55);
+  return { btn, itemfill, glow };
+}
 function paletteFromImage(path) {
   return new Promise((res) => {
     const img = new Image();
@@ -960,41 +2089,64 @@ function paletteFromImage(path) {
         // small muted descriptions) — pull each toward the text colour
         // until it reads on every surface.
         const readable = (col) => { let c = col; let g2 = 0; while (Math.min(contrast(c, bg), contrast(c, panel)) < 3 && g2++ < 12) c = mix(c, text, 0.25); return c; };
-        res({
+        const pal = {
           accent: acc, bg, bg2, panel,
           text, muted: readable(mix(text, bg, 0.4)), line: mix(bg, text, 0.22),
           cyan: readable(pickHue([5, 6, 7, 8], '#3be8ff')), pink: readable(pickHue([10, 11, 0], '#ff4fa3')), green: readable(pickHue([3, 4, 5], '#39e08a')),
-        });
+        };
+        res({ ...pal, ...deriveExtra(pal) });
       } catch { res({ ...themeDefaults, accent: '#8b4dff' }); }
     };
     img.onerror = () => res({ ...themeDefaults, accent: '#8b4dff' });
     img.src = fileUrl(path);
   });
 }
+/* Theme selection menu: the grid is grouped (Built-in, then My themes),
+   every card carries a label saying what kind of theme it is, and the
+   search box filters by name — so the list stays findable when there
+   are lots of themes instead of turning into one overcrowded pile. */
+let themeQuery = '';
+function themeKind(t) {
+  if (t.id === 'frutiger-aero') return 'Built-in';
+  if (t.css || (t.themeMusicList && t.themeMusicList.length) || t.wallpaperIntro || t.sidebarPic || t.mascot) return 'Pack';
+  return 'Picture';
+}
 function renderMyThemes() {
   const wrap = $('#myThemes'); if (!wrap) return; wrap.innerHTML = '';
-  if (!S.customThemes.length) { wrap.innerHTML = '<p class="muted" style="grid-column:1/-1;margin:0;font-size:14px">No custom themes yet. Add a picture and it will appear here — tap it any time to switch to it.</p>'; }
-  S.customThemes.forEach((t) => {
-    const card = document.createElement('div'); card.className = 'theme-card' + (S.theme === 'custom' && S.activeTheme === t.id ? ' act' : '');
-    const prev = document.createElement('div'); prev.className = 'tprev';
-    prev.style.backgroundImage = `url("${fileUrl(t.image)}")`;
-    prev.style.aspectRatio = (t.ratio || '16 / 9').replace(':', ' / ');
-    prev.style.backgroundSize = t.fit === 'contain' ? 'contain' : t.fit === 'fill' ? '100% 100%' : 'cover';
-    prev.style.backgroundPosition = t.pos || 'center'; prev.style.backgroundRepeat = 'no-repeat';
-    const row = document.createElement('div'); row.className = 'trow';
-    const nm = document.createElement('span'); nm.className = 'tname';
-    const inp = document.createElement('input'); inp.type = 'text'; inp.value = t.name || 'Theme'; inp.setAttribute('aria-label', 'Theme name');
-    inp.onclick = (e) => e.stopPropagation();
-    inp.onchange = () => { t.name = inp.value.trim() || 'Theme'; saveS(); };
-    nm.append(inp);
-    const acc = document.createElement('input'); acc.type = 'color'; acc.value = t.accent || '#8b4dff'; acc.title = 'Accent colour for this theme — picked from the picture, change it here if you like';
-    acc.onclick = (e) => e.stopPropagation();
-    acc.onchange = () => { t.accent = acc.value; t.autoAccent = false; saveS(); applyS(); }; // picked by hand — stop auto-matching this theme
-    const del = document.createElement('button'); del.className = 'tdel'; del.textContent = '✕'; del.title = 'Delete this theme';
-    del.onclick = (e) => { e.stopPropagation(); S.customThemes = S.customThemes.filter((x) => x.id !== t.id); if (S.activeTheme === t.id) S.activeTheme = ''; saveS(); applyS(); themeUI(); };
-    row.append(nm, acc, del); card.append(prev, row);
-    card.onclick = () => { sfx('click'); S.theme = 'custom'; S.activeTheme = t.id; saveS(); applyS(); themeUI(); };
-    wrap.append(card);
+  const q = themeQuery.trim().toLowerCase();
+  const list = S.customThemes.filter((t) => !q || (t.name || 'Theme').toLowerCase().includes(q));
+  if (!S.customThemes.length) { wrap.innerHTML = '<p class="muted" style="grid-column:1/-1;margin:0;font-size:14px">No custom themes yet. Add a picture and it will appear here. Tap it any time to switch to it.</p>'; }
+  else if (!list.length) { wrap.innerHTML = '<p class="muted" style="grid-column:1/-1;margin:0;font-size:14px">No themes match “' + themeQuery.trim() + '”.</p>'; }
+  const groups = [['Built-in', list.filter((t) => t.id === 'frutiger-aero')], ['My themes', list.filter((t) => t.id !== 'frutiger-aero')]];
+  groups.forEach(([label, items]) => {
+    if (!items.length) return;
+    const h = document.createElement('div'); h.className = 'themeGroup';
+    h.innerHTML = ''; h.append(document.createTextNode(label + ' '));
+    const c = document.createElement('span'); c.className = 'cnt'; c.textContent = '(' + items.length + ')'; h.append(c);
+    wrap.append(h);
+    items.forEach((t) => {
+      const card = document.createElement('div'); card.className = 'theme-card' + (S.theme === 'custom' && S.activeTheme === t.id ? ' act' : '');
+      const prev = document.createElement('div'); prev.className = 'tprev';
+      prev.style.backgroundImage = `url("${fileUrl(t.image)}")`;
+      prev.style.aspectRatio = (t.ratio || '16 / 9').replace(':', ' / ');
+      prev.style.backgroundSize = t.fit === 'contain' ? 'contain' : t.fit === 'fill' ? '100% 100%' : 'cover';
+      prev.style.backgroundPosition = t.pos || 'center'; prev.style.backgroundRepeat = 'no-repeat';
+      const lab = document.createElement('span'); lab.className = 'tlabel'; lab.textContent = themeKind(t); prev.append(lab);
+      const row = document.createElement('div'); row.className = 'trow';
+      const nm = document.createElement('span'); nm.className = 'tname';
+      const inp = document.createElement('input'); inp.type = 'text'; inp.value = t.name || 'Theme'; inp.setAttribute('aria-label', 'Theme name');
+      inp.onclick = (e) => e.stopPropagation();
+      inp.onchange = () => { t.name = inp.value.trim() || 'Theme'; saveS(); };
+      nm.append(inp);
+      const acc = document.createElement('input'); acc.type = 'color'; acc.value = t.accent || '#8b4dff'; acc.title = 'Accent colour for this theme — picked from the picture, change it here if you like';
+      acc.onclick = (e) => e.stopPropagation();
+      acc.onchange = () => { t.accent = acc.value; t.autoAccent = false; saveS(); applyS(); }; // picked by hand — stop auto-matching this theme
+      const del = document.createElement('button'); del.className = 'tdel'; del.textContent = '✕'; del.title = 'Delete this theme';
+      del.onclick = (e) => { e.stopPropagation(); const wasActive = S.activeTheme === t.id; S.customThemes = S.customThemes.filter((x) => x.id !== t.id); if (wasActive) { S.activeTheme = ''; stopThemeMusic(); } saveS(); applyS(); themeUI(); };
+      row.append(nm, acc, del); card.append(prev, row);
+      card.onclick = () => { sfx('click'); S.theme = 'custom'; S.activeTheme = t.id; saveS(); applyS(); themeSwitched(); themeUI(); };
+      wrap.append(card);
+    });
   });
   const ed = $('#themeEditor'), ct = S.customThemes.find((x) => x.id === S.activeTheme);
   if (!ed) return;
@@ -1014,8 +2166,16 @@ function renderMyThemes() {
   const ar = document.createElement('label'); ar.className = 'erow'; ar.textContent = 'Auto accent from picture ';
   const ac = document.createElement('input'); ac.type = 'checkbox'; ac.checked = ct.autoAccent !== false;
   ac.title = 'When on, the accent colour is picked from this theme’s picture. Turn it off to keep the colour you picked yourself.';
-  ac.onchange = async () => { ct.autoAccent = ac.checked; if (ac.checked) { const pal = await paletteFromImage(ct.image); ct.accent = pal.accent; ct.palette = pal; } saveS(); applyS(); themeUI(); toast(ac.checked ? 'Colours matched to the picture' : 'Accent set by hand — pick a colour on the card'); };
+  ac.onchange = async () => { ct.autoAccent = ac.checked; if (ac.checked) { const pal = await paletteFromImage(ct.image); ct.accent = pal.accent; ct.palette = pal; } saveS(); applyS(); themeUI(); toast(ac.checked ? 'Colours matched to the picture' : 'Accent set by hand. Pick a colour on the card'); };
   ar.append(ac); ed.append(ar);
+  const musicList = themeMusicList(ct);
+  if (musicList.length) { // theme packages can bring their own startup music — one track, or a list that rotates
+    const mr = document.createElement('label'); mr.className = 'erow'; mr.textContent = musicList.length > 1 ? `Theme music (${musicList.length} songs, rotates) ` : 'Theme music ';
+    const mc = document.createElement('input'); mc.type = 'checkbox'; mc.checked = ct.themeMusicOn !== false;
+    mc.title = 'Play this theme’s music when the app opens with the theme. It fades in and out, stops as soon as you play a song, and picks back up when you pause one. A list rotates to the next song each time one ends.';
+    mc.onchange = () => { ct.themeMusicOn = mc.checked; saveS(); if (mc.checked) maybePlayThemeMusic(); else stopThemeMusic(); themeUI(); };
+    mr.append(mc); ed.append(mr);
+  }
   const note = document.createElement('p'); note.className = 'muted'; note.style.cssText = 'margin:0;font-size:13px';
   note.textContent = 'Tip: 16:9 pictures (1920x1080) fit best. Cover fills the screen and crops the edges; Contain shows the whole picture with bars.'; ed.append(note);
 }
@@ -1023,13 +2183,34 @@ function themeUI() {
   all('#themes button').forEach((b) => b.classList.toggle('act', b.dataset.t === S.theme));
   renderMyThemes();
 }
-all('#themes button').forEach((b) => b.onclick = () => { sfx('click'); S.theme = b.dataset.t; if (b.dataset.t !== 'custom') S.activeTheme = ''; saveS(); applyS(); themeUI(); });
+all('#themes button').forEach((b) => b.onclick = () => { sfx('click'); S.theme = b.dataset.t; if (b.dataset.t !== 'custom') S.activeTheme = ''; saveS(); applyS(); themeSwitched(); themeUI(); });
+$('#themeSearch').oninput = (e) => { themeQuery = e.target.value; renderMyThemes(); }; // the search box filters the menu by name, live
 $('#addTheme').onclick = async () => { const r = await api.pickPics(); if (!r.length) return;
   r.forEach((p) => { const t = { id: crypto.randomUUID(), name: p.split(/[\\/]/).pop().replace(/\.[^.]+$/, ''), image: p, accent: '#8b4dff', palette: null, autoAccent: true, fit: 'cover', pos: 'center', zoom: 100, ratio: '16:9' };
     S.customThemes.push(t);
     paletteFromImage(p).then((pal) => { t.accent = pal.accent; t.palette = pal; saveS(); applyS(); themeUI(); }); // colours matched to the picture, automatically
   });
-  S.theme = 'custom'; S.activeTheme = S.customThemes[S.customThemes.length - 1].id; saveS(); applyS(); themeUI(); toast('Theme added — its accent colour was picked from the picture'); };
+  S.theme = 'custom'; S.activeTheme = S.customThemes[S.customThemes.length - 1].id; saveS(); applyS(); themeSwitched(); themeUI(); toast('Theme added. Its accent colour was picked from the picture'); };
+
+/* Theme packages: a .zip (or .gumipack) with a manifest.json and the
+   theme's files. Pick one and it installs into My Themes — this is how
+   themes travel between people and how the Marketplace will hand them
+   out. The manifest is the theme object, with file names instead of
+   paths; the main process unpacks it into the app data folder and hands
+   back the real paths. */
+$('#importTheme').onclick = async () => {
+  const r = await api.importThemePackage(); if (!r) return; // cancelled
+  if (!r.ok) return toast(r.error || 'That package could not be imported.');
+  const m = r.manifest, f = r.files;
+  const t = { id: m.id, name: m.name, image: f.image, accent: m.accent || '#8b4dff', palette: m.palette || null, autoAccent: m.autoAccent !== false, fit: m.fit || 'cover', pos: m.pos || 'center', zoom: m.zoom || 100, ratio: m.ratio || '16:9', sidebarPic: f.sidebarPic || null, sidebarFit: m.sidebarFit || 'cover', icons: f.icons || null, mascot: f.mascot || null, click: f.click || null, themeMusic: f.themeMusic || null, themeMusicList: f.themeMusicList || null, themeMusicShuffle: !!m.themeMusicShuffle, themeMusicOn: m.themeMusicOn !== false, bubble: !!m.bubble, hud: !!m.hud, menu: !!m.menu, cursor: m.cursor || null, font: f.font || null, css: f.css || null, wallpaperIntro: f.wallpaperIntro || null, wallpaperIntroMs: m.wallpaperIntroMs || null };
+  const i = S.customThemes.findIndex((x) => x.id === t.id);
+  if (i >= 0) S.customThemes[i] = t; else S.customThemes.push(t);
+  S.theme = 'custom'; S.activeTheme = t.id; saveS(); applyS(); themeSwitched(); themeUI();
+  toast(`Installed “${t.name}”. Find it in My Themes.`);
+  // the wallpaper should be 1920×1080 or it looks soft fullscreen — warn
+  // instead of blocking, since a smaller picture still works
+  const img = new Image(); img.onload = () => { if (img.naturalWidth < 1920) toast(`Heads up: “${t.name}”’s wallpaper is only ${img.naturalWidth}×${img.naturalHeight}, so it will look soft fullscreen.`); }; img.src = fileUrl(t.image);
+};
 
 $('#s-neon').checked = !!S.neon; $('#s-neon').onchange = (e) => { S.neon = e.target.checked; saveS(); applyS(); };
 $('#s-fontsize').value = S.fontSize || 16; $('#s-fontsize').oninput = (e) => { S.fontSize = +e.target.value; saveS(); applyFont(); };
@@ -1060,7 +2241,7 @@ function sndUI() {
     w.appendChild(row);
   });
 }
-themeUI(); sndUI(); applyS();
+themeUI(); sndUI(); applyS(); maybePlayThemeMusic(); // theme music loops (with fades) on startup, if the active theme has any
 
 /* Gumi: visual-novel dialogue */
 const vn = $('#vn'), txt = $('#txt'), nx = $('#nxt2'); let finish = null, adv = null;
@@ -1098,25 +2279,33 @@ addEventListener('keydown', (e) => {
   else if ((e.key === ' ' || e.key === 'Enter') && !$('#choices').children.length) { e.preventDefault(); $('#box').click(); }
 });
 
-/* Edit Gumi’s words here */
+/* Edit Gumi’s words here — a step can name a view first (['music', sel, text])
+   and the tour switches to that view before pointing at the element. */
 const TOUR = [
   ['#tabs', 'This button opens the sidebar with your Games, Music, Customize, Marketplace and Settings. Your tunes keep playing while you switch!'],
   ['#list', 'This is the Game Section. Recomps, decomps, indie games… everything you add lives here.'],
   ['#head', 'Pick a game from the list and its details show up on this side.'],
   ['#cover', 'Your art goes right here. Make it big and proud!'],
   ['#play', 'Hit Play and I’ll launch the game, then your Discord status lights up with your art.'],
+  ['#add', 'To add a game, press here. Scan its folder, pick the right .exe, add your art, and you’re done!'],
+  ['music', '#songs', 'Now for the Music Section! All your songs and albums live here — pick one and it starts playing.'],
+  ['music', '#addMusic', 'To add music, press here. Grab single songs, or a whole album folder — and I’ll turn your covers into spinning CDs on Discord!'],
+  ['music', '#mkpl', 'Make Playlist groups your songs together, so you can build one for every mood!'],
   ['#mini', 'Your music player. Pause, skip and turn it up whenever you like.'],
   ['#me', 'That’s your Discord profile. Click it to sign in or out.'],
-  ['#add', 'To add a game, press here. Scan its folder, pick the right .exe, add your art, and you’re done!'],
 ];
 async function tour() {
-  for (const [s, t] of TOUR) { spot(s); await say(t); }
+  for (const step of TOUR) {
+    const [v, s, t] = step.length === 3 ? step : [null, step[0], step[1]];
+    if (v) setView(v);
+    spot(s); await say(t);
+  }
   spot('#ask'); await say('That’s everything! Click my face down here whenever you need a hand.'); end();
 }
 async function intro() {
   vn.classList.add('open'); spot(null);
   await say('Hiya! I’m Gumi, and I’ll be your guide around here!');
-  await say('Gumi RPC launches your games and shows off your own art on Discord.');
+  await say('Gumi RPC launches your games, plays your music, and shows off your own art on Discord.');
   await type('Want a quick tour of how everything works?');
   if (await choose(['Yes, show me!', 'No thanks']) === 0) { await say('Yay! Follow me!'); await tour(); }
   else { spot('#ask'); await say('No problem! I’m always here. Click my face down here any time you want help.'); end(); }
@@ -1127,6 +2316,15 @@ $('#ask').onclick = async () => {
 };
 
 api.onToast((t) => toast(t)); setView('games'); refresh(); loadMusic(); api.restore().then((p) => { me = p; showMe(); }); if (!localStorage.getItem('gumi-seen')) intro();
-api.onUpdateReady(() => { $('#s-restart').classList.remove('off'); $('#updateStatus').textContent = 'Update downloaded — restart to install it'; });
+/* Developer / Showcasing mode is dev-copy only: the toggle only appears
+   when the `dev-mode` marker file exists in %APPDATA%\gumi-rpc. If the
+   marker is gone but the setting is still on, turn the mode off so a
+   public install can never end up showing the sample library. */
+api.isDev().then((isDev) => {
+  if (!isDev) { if (S.devMode) { S.devMode = false; saveS(); refresh(); loadMusic(); } return; }
+  document.querySelector('#devRow').style.display = '';
+  if (S.devMode) document.querySelector('#demoBadge').style.display = '';
+});
+api.onUpdateReady(() => { $('#s-restart').classList.remove('off'); $('#updateStatus').textContent = 'Update downloaded. Restart to install it'; });
 api.getVersion().then((v) => { $('#updateStatus').textContent = 'Version ' + v; });
 </script></body></html>

@@ -1,6 +1,6 @@
 {
   "name": "gumi-rpc",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Launcher and custom Discord Rich Presence for indie games",
   "main": "main.js",
   "scripts": {
